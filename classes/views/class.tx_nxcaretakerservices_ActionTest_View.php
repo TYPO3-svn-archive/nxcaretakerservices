@@ -42,7 +42,7 @@ require_once (t3lib_extMgm::extPath('caretaker').'/classes/class.tx_caretaker_He
 $BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
 	// DEFAULT initialization of a module [END]
 
-class tx_nxcaretakerservices_InstallTool_View extends t3lib_SCbase {
+class tx_nxcaretakerservices_ActionTest_View extends t3lib_SCbase {
 
 	var $info;
 	

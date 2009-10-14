@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<!-- 
+/**
+ * This is a file of the caretaker project.
+ * Copyright 2008 by n@work Internet Informationssystem GmbH (www.work.de)
+ * 
+ * @Author	Thomas Hempel 		<thomas@work.de>
+ * @Author	Martin Ficzel		<martin@work.de>
+ * @Author	Tobias Liebig		<mail_typo3.org@etobi.de>
+ * @Author	Christopher Hlubek 	<hlubek@networkteam.com>
+ * @Author	Patrick Kollodzik	<patrick@work.de>
+ * 
+ * $$Id: locallang_db.xml 46 2008-06-19 16:09:17Z martin $$
+ */
+-->
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'nxcaretakerservices'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">						
+			<label index="tx_caretaker_action">Action</label>
+			<label index="tx_caretaker_action.tab.relations">Instances &amp; Groups</label>
+			<label index="tx_caretaker_action.tab.description">Description</label>
+			<label index="tx_caretaker_action.tab.notifications">Notifications</label>
+			<label index="tx_caretaker_action.tab.configuration">Test-Configuration</label>
+			<label index="tx_caretaker_action.title">Name</label>
+			<label index="tx_caretaker_action.notifiactions">Notifications</label>
+			<label index="tx_caretaker_action.description">Description</label>
+			<label index="tx_caretaker_action.test_service.select_service">Please select a test</label>
+			<label index="tx_caretaker_action.test_service">Test Service</label>
+			<label index="tx_caretaker_action.test_interval">Test Interval</label>
+			<label index="tx_caretaker_action.test_interval_start_hour">Run after this Hour</label>
+			<label index="tx_caretaker_action.test_interval_stop_hour">Run before this Hour</label>
+			<label index="tx_caretaker_action.test_service">Test Service</label>
+			<label index="tx_caretaker_action.test_conf">Test Configuration</label>
+			<label index="tx_caretaker_action.test_mode">Test Mode</label>
+			<label index="tx_caretaker_action.test_mode.group">run once for group</label>
+			<label index="tx_caretaker_action.instances">Include Test for those Instances</label>
+			<label index="tx_caretaker_action.groups">Include Test for those Testgroups</label>
+			<label index="tx_caretaker_action.notifications">Notifications</label>			
+		</languageKey>
+		<languageKey index="de" type="array">
+
+		</languageKey>
+	</data>
+</T3locallang>
