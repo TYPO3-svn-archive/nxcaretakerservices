@@ -52,12 +52,41 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 	}	
 	
 	public function delete() {
-		return 'DELETE!!!!!!';
+		
+		$operation = array('InstallToolAction', array('action' => 'delete'));
+		$operations = array($operation);
+
+		$commandResult = $this->executeRemoteOperations($operations);
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			// error!
+		}
+
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
+		
+		return $message;
 	}
 	
 	public function create() {
-		return 'CREATE!!!!!!';
+
+		$operation = array('InstallToolAction', array('action' => 'create'));
+		$operations = array($operation);
+
+		$commandResult = $this->executeRemoteOperations($operations);
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			// error!
+		}
+
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
+		
+		return $message;
 	}
+	
 	public function doAction($method)
 	{
 		$Result="";

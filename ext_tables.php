@@ -45,48 +45,55 @@ if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
 	
 }
 
-t3lib_div::loadTCA('tx_caretaker_testgroup');
-$TCA['tx_caretaker_testgroup']['columns']['tests']['config'] = Array (
-/*
-	'type'          => 'select',
-	'foreign_table' => 'tx_caretaker_test',
-	'MM'            => 'tx_caretaker_testgroup_test_mm',
-	'MM_opposite_field' => 'groups',
-*/
-	'type' => 'group',
-	'internal_type' => 'db',
 
-	'allowed' => 'tx_caretaker_test,tx_caretaker_action',
-	'MM'            => 'tx_caretaker_testgroup_test_mm',
 
-	'size'          => 5,
-	'autoSizeMax'   => 10,
-	'minitems'      => 0,
-	'maxitems'      => 99,
-	'wizards' => Array( 
-		'_PADDING' => 1, 
-		'_VERTICAL' => 1, 
-		'edit' => Array( 
-			'type' => 'popup', 
-			'title' => 'Edit Test', 
-			'script' => 'wizard_edit.php', 
-			'icon' => 'edit2.gif', 
-			'popup_onlyOpenIfSelected' => 1, 
-			'JSopenParams' => 'height=350,width=580,status=0,menubar=0,scrollbars=1', 
-		), 
-		'add' => Array( 
-			'type' => 'script', 
-			'title' => 'Create new Test', 
-			'icon' => 'add.gif', 
-			'params' => Array( 
-				'table'=>'tx_caretaker_test', 
-				'pid' => '###CURRENT_PID###', 
-				'setValue' => 'prepend' 
-			), 
-			'script' => 'wizard_add.php', 
-		),
-	)
-);
+
+t3lib_div::loadTCA('tx_caretaker_instance');
+$tempColumns = array('tx_nxcaretakerservices_action' => Array (
+	      'exclude' => 1,
+	      'label' => 'LLL:EXT:nxcaretakerservices/locallang_db.xml:tx_caretaker_instanceaction.actions',
+	      'config' => Array (
+			'type'          => 'select',
+			'foreign_table' => 'tx_caretaker_action',
+			'size'          => 5,
+			'autoSizeMax'   => 25,
+			'minitems'      => 0,
+			'maxitems'      => 50,
+			'MM'            => 'tx_nxcaretakerservices_instance_action_mm',
+	   		'MM_opposite_field' => 'instances',
+				'size'          => 5,
+				'autoSizeMax'   => 10,
+				'minitems'      => 0,
+				'maxitems'      => 99,
+				'wizards' => Array( 
+					'_PADDING' => 1, 
+					'_VERTICAL' => 1, 
+					'edit' => Array( 
+						'type' => 'popup', 
+						'title' => 'Edit Action', 
+						'script' => 'wizard_edit.php', 
+						'icon' => 'edit2.gif', 
+						'popup_onlyOpenIfSelected' => 1, 
+						'JSopenParams' => 'height=350,width=580,status=0,menubar=0,scrollbars=1', 
+					), 
+					'add' => Array( 
+						'type' => 'script', 
+						'title' => 'Create new Action', 
+						'icon' => 'add.gif', 
+						'params' => Array( 
+							'table'=>'tx_caretaker_action', 
+							'pid' => '###CURRENT_PID###', 
+							'setValue' => 'prepend' 
+						), 
+						'script' => 'wizard_add.php', 
+					),
+				), 
+	      )
+	    )
+)
+;
 	
+  t3lib_extMgm::addTCAcolumns("tx_caretaker_instance",$tempColumns,1);
+  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_nxcaretakerservices_action;;;;1-1-1");
 
 ?>

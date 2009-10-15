@@ -9,22 +9,26 @@ class tx_nxcaretakerservices_Action {
 	public function doaction($params, &$ajaxObj){
 		
 		$result="";
+		$node_id = t3lib_div::_GP('node');
+		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id) ){
+			
+			$serviceText = t3lib_div::_GP('service');
+			$service = t3lib_div::makeInstanceService('caretaker_test_service', $serviceText);
+			$service->setInstance( $node->getInstance() );
 		
-		$serviceText = t3lib_div::_GP('service');
-		$service = t3lib_div::makeInstanceService('caretaker_test_service', $serviceText);
-		
-		$method = t3lib_div::_GP('method');
-		if($method)
-		{
-			$result = $service->doAction($method);				
+			$method = t3lib_div::_GP('method');
+			if($method)
+			{
+				$result = $service->doAction($method);				
+			}
+			else $result = $service->getView($serviceText);
 		}
-		else $result = $service->getView($serviceText);
 	echo $result;
 	}
 
 	public function getActionsByInstanceUid ($instance_id, $parent = false, $show_hidden = FALSE){
 		$ids = array();
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid_local', 'tx_caretaker_instance_test_mm', 'uid_foreign='.(int)$instance_id, '' , 'sorting_foreign');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid_local', 'tx_nxcaretakerservices_instance_action_mm', 'uid_foreign='.(int)$instance_id, '' , 'sorting_foreign');
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
 			$ids[] = $row['uid_local'];
 		}
@@ -83,18 +87,29 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
            							success : function (response, opts){											
       									
            								var node_info_panel = Ext.getCmp("node-info-action");
-        								node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id+"&resp="+response.responseText+"&action='.$action->getUid().'");
+        								node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$action->getUid().'");
         								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								var node_added_panel = Ext.getCmp("node-added-action");
-        								node_added_panel.getBottomToolbar().removeAll();										
+        								
+        								node_added_panel.getBottomToolbar().removeAll();
+        								node_added_panel.getBottomToolbar().addButton(
+        								{			
+											text	:	"refresh",
+											icon    : 	"../res/icons/arrow_refresh_small.png",
+											handler	:	function (){
+         										var node_info_panel = Ext.getCmp("node-info-action");
+        										node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$action->getUid().'");
+        										}
+										});
+										
 										node_added_panel.getBottomToolbar().addButton(jsonData);
 										node_added_panel.doLayout();        								       								       								
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
-               							service:   "'.$action->getServiceType().'"               							             							
+               							service:   "'.$action->getServiceType().'"               							               							             							
             								}
         							});
     						}
@@ -103,6 +118,7 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 		}			
 		echo $result.']';	
 	}
+		
 	
 	public function ajaxGetNodeInfo($params, &$ajaxObj){
 		
