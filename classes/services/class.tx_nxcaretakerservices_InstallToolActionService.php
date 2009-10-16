@@ -105,13 +105,14 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 		return $Result;
 	}
 		
-	public function getView($service) {
-		return '[{text:"delete",handler:
+	public function getView($service, $actionId) {
+		
+		$message ='[{text:"delete",handler:
 							function (){								
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      									alert(response.responseText);											       								       								
+      									Ext.MessageBox.alert("Status", response.responseText);										       								       								
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
@@ -127,7 +128,8 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      									alert(response.responseText);           																       								       								
+      									Ext.MessageBox.alert("Status", response.responseText);
+           							        																       								       								
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
@@ -138,6 +140,25 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
         							});
     						}
 	}]';
+		
+		$jsonData = 'new Ext.Panel({
+        									id              : "node-added-action",
+        									html            : "Actions:",
+        									autoHeight      : true   ,
+											bbar 			: [
+											{			
+											text	:	"refresh",
+											icon    : 	"../res/icons/arrow_refresh_small.png",
+											handler	:	function (){
+         										var node_info_panel = Ext.getCmp("node-info-action");
+        										node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
+        										}
+											}, "-" , '.$message .'
+											]
+    									})';
+		return $jsonData;
+		
+		
 	}
 }
 

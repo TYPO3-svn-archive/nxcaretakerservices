@@ -13,6 +13,7 @@ class tx_nxcaretakerservices_Action {
 		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id) ){
 			
 			$serviceText = t3lib_div::_GP('service');
+			$actionid = t3lib_div::_GP('actionid');
 			$service = t3lib_div::makeInstanceService('caretaker_test_service', $serviceText);
 			$service->setInstance( $node->getInstance() );
 		
@@ -21,7 +22,7 @@ class tx_nxcaretakerservices_Action {
 			{
 				$result = $service->doAction($method);				
 			}
-			else $result = $service->getView($serviceText);
+			else $result = $service->getView($serviceText, $actionid);
 		}
 	echo $result;
 	}
@@ -81,35 +82,27 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 			{ 
 			text	: "' . $action->getTitle() . '",
 			icon    : "../res/icons/pencil.png",
-			handler :   function (){								
+			handler :   function (){	
+								var node_info_panel = Ext.getCmp("node-info-action");
+        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$action->getUid().'");
+        															
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      									
-           								var node_info_panel = Ext.getCmp("node-info-action");
-        								node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$action->getUid().'");
-        								
+      									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								var node_added_panel = Ext.getCmp("node-added-action");
         								
-        								node_added_panel.getBottomToolbar().removeAll();
-        								node_added_panel.getBottomToolbar().addButton(
-        								{			
-											text	:	"refresh",
-											icon    : 	"../res/icons/arrow_refresh_small.png",
-											handler	:	function (){
-         										var node_info_panel = Ext.getCmp("node-info-action");
-        										node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$action->getUid().'");
-        										}
-										});
-										
-										node_added_panel.getBottomToolbar().addButton(jsonData);
-										node_added_panel.doLayout();        								       								       								
+										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										viewpanel.removeAll();
+										viewpanel.add(jsonData);
+										viewpanel.doLayout(); 	
+															       								       								
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
-               							service:   "'.$action->getServiceType().'"               							               							             							
+               							service:   "'.$action->getServiceType().'" ,
+               							actionid:      "'.$action->getUid().'"        							               							             							
             								}
         							});
     						}

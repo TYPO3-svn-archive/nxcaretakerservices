@@ -6,6 +6,14 @@
 	<ROOT>
 		<TCEforms> 
 			<sheetTitle>Default</sheetTitle> 
-		</TCEforms>			
+		</TCEforms>		
+			<type>array</type>
+		<el>
+			<blacklist>
+				<TCEforms>
+					<label>none</label>					
+				</TCEforms>
+			</blacklist>
+		</el>	
 	</ROOT>
 </T3DataStructure>
