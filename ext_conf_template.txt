@@ -1,0 +1,2 @@
+# cat=nxcaretakerservices; type=boolean; label=Enable Caretaker Server Extensions
+enableServerExt = 0

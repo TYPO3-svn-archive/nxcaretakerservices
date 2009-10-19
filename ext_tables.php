@@ -4,53 +4,46 @@ if (!defined ('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-$TCA['tx_caretaker_action'] = array (
-	'ctrl' => array (
-		'title'     => 'LLL:EXT:nxcaretakerservices/locallang_db.xml:tx_caretaker_action',
-		'label'     => 'title',
-		'tstamp'    => 'tstamp',
-		'crdate'    => 'crdate',
-		'cruser_id' => 'cruser_id',
-		'default_sortby' => 'ORDER BY title',
-		'delete' => 'deleted',
-		'requestUpdate' => 'test_service',
-		'dividers2tabs'=> 1,
-	    'enablecolumns' => array (        
-			'disabled' => 'hidden',
-			'starttime' => 'starttime',
-			'endtime' => 'endtime',
-			'fe_group' => 'fe_group',
-    	),
-		'type' => 'testservice',
-		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'res/icons/test.png',
-	),
-	'feInterface' => array (
-		'fe_admin_fieldList' => '',
-	),
-);
+$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
+if($confArray['enableServerExt'])
+{
 
-
-if (t3lib_extMgm::isLoaded('caretaker') ){
-	include_once(t3lib_extMgm::extPath('caretaker') . 'classes/class.tx_caretaker_ServiceHelper.php');
+	$TCA['tx_caretaker_action'] = array (
+		'ctrl' => array (
+			'title'     => 'LLL:EXT:nxcaretakerservices/locallang_db.xml:tx_caretaker_action',
+			'label'     => 'title',
+			'tstamp'    => 'tstamp',
+			'crdate'    => 'crdate',
+			'cruser_id' => 'cruser_id',
+			'default_sortby' => 'ORDER BY title',
+			'delete' => 'deleted',
+			'requestUpdate' => 'test_service',
+			'dividers2tabs'=> 1,
+		    'enablecolumns' => array (        
+				'disabled' => 'hidden',
+				'starttime' => 'starttime',
+				'endtime' => 'endtime',
+				'fe_group' => 'fe_group',
+	    	),
+			'type' => 'testservice',
+			'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
+			'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'res/icons/test.png',
+		),
+		'feInterface' => array (
+			'fe_admin_fieldList' => '',
+		),
+	);
+	
+	
+	if (t3lib_extMgm::isLoaded('caretaker') ){
+		include_once(t3lib_extMgm::extPath('caretaker') . 'classes/class.tx_caretaker_ServiceHelper.php');
+			
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Check for an open Install Tool', 'Look for ENABLE_INSTALL_TOOL');
 		
-	tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Check for an open Install Tool', 'Look for ENABLE_INSTALL_TOOL');
-	
-}
-if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
-	include_once(t3lib_extMgm::extPath('nxcaretakerservices') . 'classes/class.tx_nxcaretakerservices_ActionServiceHelper.php');
+	}
 
-	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'TYPO3 -> test Action', 'test');
-	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Install Tool Action', 'create and delete the install tool');
-	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_BackendUser',  'TYPO3 -> User management', 'enable an disable backend users');
-	
-}
-
-
-
-
-t3lib_div::loadTCA('tx_caretaker_instance');
-$tempColumns = array('tx_nxcaretakerservices_action' => Array (
+	t3lib_div::loadTCA('tx_caretaker_instance');
+	$tempColumns = array('tx_nxcaretakerservices_action' => Array (
 	      'exclude' => 1,
 	      'label' => 'LLL:EXT:nxcaretakerservices/locallang_db.xml:tx_caretaker_instanceaction.actions',
 	      'config' => Array (
@@ -95,6 +88,21 @@ $tempColumns = array('tx_nxcaretakerservices_action' => Array (
 ;
 	
   t3lib_extMgm::addTCAcolumns("tx_caretaker_instance",$tempColumns,1);
-  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_nxcaretakerservices_action;;;;1-1-1");
+  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_caretaker_action;;;;1-1-1");
+	
+	
+}
+if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
+	include_once(t3lib_extMgm::extPath('nxcaretakerservices') . 'classes/class.tx_nxcaretakerservices_ActionServiceHelper.php');
+
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'TYPO3 -> test Action', 'test');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Install Tool Action', 'create and delete the install tool');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_BackendUser',  'TYPO3 -> User management', 'enable an disable backend users');
+	
+}
+
+
+
+
 
 ?>
