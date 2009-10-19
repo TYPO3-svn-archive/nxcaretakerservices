@@ -152,7 +152,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 				
 		foreach($operationResult as $row){
 			if($message != '[') $message = $message . ',';
-			$message = $message . $this->getButton2($service, $row);
+			$message = $message . $this->getRows($service, $row);
 		}
 		$message = $message . ']';
 		
@@ -631,57 +631,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     		})
 		
 		';
-		
-		
-		
-		$jsonData = 'new Ext.Panel({
-        									id              : "node-added-action",
-        									html            : "Actions:",
-        									autoHeight      : true   ,
-											items			: '.$message.',
-        									bbar 			: [
-											{			
-											text	:	"refresh",
-											icon    : 	"../res/icons/arrow_refresh_small.png",
-											handler	:	function (){
-         										var node_info_panel = Ext.getCmp("node-info-action");
-        										node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        										}
-											} 
-											]
-    									})';
-		//return $jsonData;
+	
 		return $grid;
 	}
 		
-	public function getButton2($service, $row) {
+	public function getRows($service, $row) {
 		return  '["'.$row['uid'].'","'.$row['username'].'","'.$row['admin'].'","'.$row['disable'].'","'.$row['llogin'].'","'.$row['email'].'","'.$row['realName'].'"]';
 	}
-	
-	public function getButton($service, $row) {
-		
-		return 'new Ext.Panel({html:"'.$row['username'].'",
-		autoHeight      : true   ,				
-		bbar 			: [{
-				text : "test",
-				handler:
-							function (){								
-        						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
-           							success : function (response, opts){											
-      									alert(response.responseText);											       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
-               							service:   "'.$service.'",
-               							method: "'.$row['username'].'"               							             							
-            								}
-        							});
-    						}
-    						}]
-	})';
-	}
+
 
 
 
