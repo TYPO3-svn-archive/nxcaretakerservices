@@ -52,7 +52,11 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 	
 	public function versionUpdate() {
 
-		$operation = array('UpdateNxcaretakerservicesAction', array('version' => json_encode($EM_CONF['nxcaretakerservices']['version'])));
+		$_EXTKEY = 'nxcaretakerservices';		
+		@include(t3lib_extMgm::extPath('nxcaretakerservices', 'ext_emconf.php'));
+		
+		
+		$operation = array('UpdateNxcaretakerservicesAction', array('version' => $EM_CONF['nxcaretakerservices']['version']));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
