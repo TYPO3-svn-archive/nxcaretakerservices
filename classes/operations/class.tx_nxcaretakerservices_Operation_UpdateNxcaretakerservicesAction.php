@@ -52,7 +52,7 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 		$dirname = PATH_site . 'typo3conf/ext/nxcaretakerservices/';
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
 
-		$svnCommand = 'svn co https://svn.typo3.org/TYPO3v4/Extensions/nxcaretakerservices/trunk ' . $dirname;
+		$svnCommand = $dirname . 'svn co https://svn.typo3.org/TYPO3v4/Extensions/nxcaretakerservices/trunk .';
 		
 		$result = exec($svnCommand);
 		
