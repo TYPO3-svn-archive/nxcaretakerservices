@@ -43,7 +43,7 @@ if($confArray['enableServerExt'])
 	}
 
 	t3lib_div::loadTCA('tx_caretaker_instance');
-	$tempColumns = array('tx_nxcaretakerservices_action' => Array (
+	$tempColumns = array('tx_nxcaretakerservices_actions' => Array (
 	      'exclude' => 1,
 	      'label' => 'LLL:EXT:nxcaretakerservices/locallang_db.xml:tx_caretaker_instanceaction.actions',
 	      'config' => Array (
@@ -88,7 +88,7 @@ if($confArray['enableServerExt'])
 ;
 	
   t3lib_extMgm::addTCAcolumns("tx_caretaker_instance",$tempColumns,1);
-  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_caretaker_action;;;;1-1-1");
+  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_nxcaretakerservices_actions;;;;1-1-1",'',"before:notifications,--palette--;;4,after:test");
 	
 	
 }

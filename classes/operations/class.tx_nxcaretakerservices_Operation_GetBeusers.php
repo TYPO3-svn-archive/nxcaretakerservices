@@ -24,6 +24,7 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_OperationResult.php'));
 
+
 /**
  * An Operation that returns the first record matched by a field name and value as an array (excluding protected record details like be_user password).
  * This operation should be SQL injection safe. The table has to be mapped in the TCA.
@@ -121,7 +122,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 				'uid, username, admin, disable, FROM_UNIXTIME(lastlogin) AS llogin, email, realName',
 				$table,
-				 '1 = 1' . t3lib_BEfunc::deleteClause($table));
+				 $GLOBALS['TCA'][$table]['ctrl']['delete'].'=0');
 			
 			if ($result) {
 				

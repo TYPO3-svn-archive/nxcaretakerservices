@@ -144,8 +144,12 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		
 		$results = $commandResult->getOperationResults();
 		
-		$operationResult = $results[0]->getValue();
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			return 'error '. print_r($commandResult);
+		}
 		
+		$operationResult = $results[0]->getValue();
+				
 		foreach($operationResult as $row){
 			if($message != '[') $message = $message . ',';
 			$message = $message . $this->getButton2($service, $row);

@@ -89,14 +89,15 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      									           								
-        								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
-										viewpanel.removeAll();
-										viewpanel.add(jsonData);
-										viewpanel.doLayout(); 	
-															       								       								
+      									if(response.responseText.substr(0,5)=="error") alert(response.responseText);
+      									else{            								
+	        								var jsonData = Ext.util.JSON.decode(response.responseText);
+	        								
+											var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+											viewpanel.removeAll();
+											viewpanel.add(jsonData);
+											viewpanel.doLayout(); 																	       								       								
+	    									}
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",

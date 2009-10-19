@@ -59,3 +59,9 @@ CREATE TABLE tx_nxcaretakerservices_instance_action_mm (
 	KEY uid_foreign (uid_foreign)
 );
 
+#
+# add Table structure for table 'tx_caretaker_instance'
+#
+CREATE TABLE tx_caretaker_instance (
+	tx_nxcaretakerservices_actions text NOT NULL,
+);
