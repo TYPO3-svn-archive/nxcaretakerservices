@@ -42,14 +42,16 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 					
 		$serverVersion = $parameter['version'];			
 
-		$clientVersion = $EM_CONF['nxcaretakerservices']['version'];
+		$clientVersion = json_encode($EM_CONF['nxcaretakerservices']['version']);
 		
 		if($serverVersion == $clientVersion) return new tx_caretakerinstance_OperationResult(TRUE, 'ClientVersion is equal to the serverVersion.');
 		
 		$dirname = PATH_site . 'typo3conf/ext/nxcaretakerservices/';
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
 
-		$result = exec('svn', array('co','https://svn.typo3.org/TYPO3v4/Extensions/nxcaretakerservices/trunk',$dirname));
+		$svnCommand = 'svn';
+		$params = array('co','https://svn.typo3.org/TYPO3v4/Extensions/nxcaretakerservices/trunk', $dirname);
+		$result = exec($svnCommand, $params);
 		
 		return new tx_caretakerinstance_OperationResult(TRUE, $result);
 	}

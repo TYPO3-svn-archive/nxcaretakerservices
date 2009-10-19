@@ -145,7 +145,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		$results = $commandResult->getOperationResults();
 		
 		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return 'error '. print_r($commandResult);
+			return 'error '. $commandResult->getMessage();
 		}
 		
 		$operationResult = $results[0]->getValue();

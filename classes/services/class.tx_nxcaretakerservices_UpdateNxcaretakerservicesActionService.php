@@ -52,12 +52,12 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 	
 	public function versionUpdate() {
 
-		$operation = array('UpdateNxcaretakerservicesAction', array('version' => $EM_CONF['nxcaretakerservices']['version']));
+		$operation = array('UpdateNxcaretakerservicesAction', array('version' => json_encode($EM_CONF['nxcaretakerservices']['version'])));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
 		if (!$this->isCommandResultSuccessful($commandResult)) {
-			// error!
+			return 'error '. $commandResult->getMessage();
 		}
 
 		$results = $commandResult->getOperationResults();
