@@ -47,7 +47,7 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 		@include(t3lib_extMgm::extPath('nxcaretakerservices', 'ext_emconf.php'));
 		$clientVersion = $EM_CONF['nxcaretakerservices']['version'];
 		
-		if($serverVersion == $clientVersion) return new tx_caretakerinstance_OperationResult(TRUE, 'ClientVersion is equal to the serverVersion. ' . $clientVersion . ' - ' . $serverVersion);
+		if($serverVersion == $clientVersion) return new tx_caretakerinstance_OperationResult(TRUE, 'ClientVersion is equal to the serverVersion. ' . $clientVersion);
 		
 		$dirname = PATH_site . 'typo3conf/ext/nxcaretakerservices/';
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
