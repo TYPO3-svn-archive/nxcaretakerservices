@@ -94,12 +94,17 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 		$message ='[{text:"Update head revision",
 						icon    : "../res/icons/arrow_refresh.png",
 						handler:
-							function (){								
+							function (){
+								var node_info_panel = Ext.getCmp("node-added-action");	
+								node_info_panel.removeAll()	;							
+								node_info_panel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								node_info_panel.doLayout();
+																
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									Ext.MessageBox.alert("Status", response.responseText);
-      									var node_info_panel = Ext.getCmp("node-added-action");
+      									
         								node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");       																											       								       								
     									}     , 
            							params: { 
@@ -153,12 +158,17 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 						                    							                    							                    	
 						                    	if( rep.isValid()) {
 						                    		win.hide();
-						                    							                    		
-					        						Ext.Ajax.request({
+						                    		
+						                    		var node_info_panel = Ext.getCmp("node-added-action");								
+													node_info_panel.removeAll()	;
+						                    		node_info_panel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+													node_info_panel.doLayout();			                    		
+					        						
+													Ext.Ajax.request({
 					           							url: tx.caretaker.back_path + "ajax.php",
 					           							success : function (response, opts){											
 					      									Ext.MessageBox.alert("Status", response.responseText);
-					      									var node_info_panel = Ext.getCmp("node-added-action");
+					      									
 					        								node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");       																											       								       								
 					    									}     , 
 					           							params: { 

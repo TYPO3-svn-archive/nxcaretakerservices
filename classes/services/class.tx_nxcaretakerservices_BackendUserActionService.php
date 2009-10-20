@@ -176,7 +176,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			}),
         		cm: new Ext.grid.ColumnModel([
             			new Ext.grid.CheckboxSelectionModel(),
-    				{id:"uid",header: "ID", width: 4, sortable: true, dataIndex: "uid"},
+    				{header: "ID", width: 4, sortable: true, dataIndex: "uid"},
             		{header: "Username", width: 10, sortable: true, dataIndex: "username"},
             		{header: "Name", width: 16, sortable: true, dataIndex: "realName"},
             		{header: "is Admin", width: 6, sortable: false, dataIndex: "admin"},
@@ -194,14 +194,18 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             			tooltip:"Reload all users",
             			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler:	 function (){	
-																	
+
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();	
+								
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -236,6 +240,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             						i++;
             					}
             					
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();
+            					
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
@@ -246,8 +255,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
+        																		
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -287,6 +295,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             						i++;
             					}
             					
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();
+								
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
@@ -297,8 +310,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
+        																		
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -338,6 +350,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             						i++;
             					}
             					
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();
+            					
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
@@ -348,8 +365,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
+        																		
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -389,6 +405,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             						i++;
             					}
             					
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();
+            					
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
@@ -400,7 +421,6 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -442,6 +462,12 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					Ext.MessageBox.confirm("Confirm", "Are you sure you want to do that?", function(btn)
             					{
             					if(btn == "yes"){
+            					
+            					var viewpanel = Ext.getCmp("nxcaretakerAction");
+								viewpanel.removeAll();
+								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.doLayout();
+            					
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
@@ -452,8 +478,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										var viewpanel = Ext.getCmp("nxcaretakerAction");
+        																		
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -558,7 +583,12 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 						                    							                    	
 						                    	if(username.isValid() && email.isValid() && password.isValid() && password2.isValid()) {
 						                    		win.hide();
-						                    							                    		
+
+						                    		var viewpanel = Ext.getCmp("nxcaretakerAction");
+													viewpanel.removeAll()	;
+													viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+													viewpanel.doLayout();
+						                    		
 					        						Ext.Ajax.request({
 					           							url: tx.caretaker.back_path + "ajax.php",
 					           							success : function (response, opts){											
@@ -569,8 +599,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 					           							success : function (response, opts){											
 					      									           								
 					        								var jsonData = Ext.util.JSON.decode(response.responseText);
-					        								
-															var viewpanel = Ext.getCmp("nxcaretakerAction");
+					        																							
 															viewpanel.removeAll();
 															viewpanel.add(jsonData);
 															viewpanel.doLayout(); 	
