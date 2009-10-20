@@ -54,7 +54,7 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
 
 		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn ';
-		if($rep) $svnCommand = $svnCommand . ' co URL '. $rep . ' . ';
+		if($rep) $svnCommand = $svnCommand . ' co '. $rep . ' . ';
 		else $svnCommand = $svnCommand . ' up ';
 		if($rev) $svnCommand = $svnCommand . ' -r '. $rev;
 		$result = exec($svnCommand);
