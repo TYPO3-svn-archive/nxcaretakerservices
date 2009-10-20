@@ -58,8 +58,8 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 		else $svnCommand = $svnCommand . ' up ';
 		if($rev) $svnCommand = $svnCommand . ' -r '. $rev;
 		$result = exec($svnCommand);
-		
-		return new tx_caretakerinstance_OperationResult(TRUE, $svnCommand . $result);
+		if($result) return new tx_caretakerinstance_OperationResult(TRUE, $result);
+		else return new tx_caretakerinstance_OperationResult(FALSE, $svnCommand .' did not work.');
 	}
 }
 ?>
