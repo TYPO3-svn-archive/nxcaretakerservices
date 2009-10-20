@@ -41,7 +41,8 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 	public function execute($parameter = array()) {										
 					
 		$serverVersion = $parameter['version'];			
-
+		$rev=$parameter['rev'];
+		$rep=$parameter['rep'];
 		
 		$_EXTKEY = 'nxcaretakerservices';		
 		@include(t3lib_extMgm::extPath('nxcaretakerservices', 'ext_emconf.php'));
@@ -52,8 +53,10 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 		$dirname = PATH_site . 'typo3conf/ext/nxcaretakerservices/';
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
 
-		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn up';
-		
+		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn ';
+		if($rep) $svnCommand = $svnCommand . ' co URL '. $rep;
+		else $svnCommand = $svnCommand . ' up ';
+		if($rev) $svnCommand = $svnCommand . ' -r '. $rev;
 		$result = exec($svnCommand);
 		
 		return new tx_caretakerinstance_OperationResult(TRUE, $svnCommand . $result);

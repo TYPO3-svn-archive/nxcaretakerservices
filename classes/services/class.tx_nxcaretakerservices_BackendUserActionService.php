@@ -194,16 +194,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             			tooltip:"Reload all users",
             			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler:	 function (){	
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -242,16 +240,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       										
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -295,16 +291,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       										
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -348,16 +342,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       										
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -401,16 +393,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       										
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -456,16 +446,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       										
-								var node_info_panel = Ext.getCmp("node-info-action");
-        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-        															
+																		
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
         								
-										var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+										var viewpanel = Ext.getCmp("nxcaretakerAction");
 										viewpanel.removeAll();
 										viewpanel.add(jsonData);
 										viewpanel.doLayout(); 	
@@ -575,16 +563,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 					           							url: tx.caretaker.back_path + "ajax.php",
 					           							success : function (response, opts){											
 					      										
-													var node_info_panel = Ext.getCmp("node-info-action");
-					        						node_info_panel.load( tx.caretaker.back_path + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + tx.caretaker.node_info.id + "&action='.$actionId.'");
-					        															
+																						
 					        						Ext.Ajax.request({
 					           							url: tx.caretaker.back_path + "ajax.php",
 					           							success : function (response, opts){											
 					      									           								
 					        								var jsonData = Ext.util.JSON.decode(response.responseText);
 					        								
-															var viewpanel = Ext.getCmp("nxcaretakerEmptyPanel");
+															var viewpanel = Ext.getCmp("nxcaretakerAction");
 															viewpanel.removeAll();
 															viewpanel.add(jsonData);
 															viewpanel.doLayout(); 	
