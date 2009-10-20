@@ -52,12 +52,11 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 			$svnCommand = $svnCommand . 'info';
 			$output = array();
 			exec($svnCommand, $output);
-			$result = '<DIV>';
+			$result = 'SVN Info:';
 			foreach($output as $line){
-				$result = $result . $line . '<br />';				
+				$result = $result . '<br />' . $line;				
 			}
-			if($result == '<DIV>') $result = false;
-			else $result = $result . '</DIV>';
+			if($result == 'SVN Info:') $result = false;			
 		}
 		else{
 			if($rep) $svnCommand = $svnCommand . ' co '. $rep . ' . ';
