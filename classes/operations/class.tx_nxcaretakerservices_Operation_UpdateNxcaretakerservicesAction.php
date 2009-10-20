@@ -40,24 +40,31 @@ class tx_nxcaretakerservices_Operation_UpdateNxcaretakerservicesAction implement
 	 */
 	public function execute($parameter = array()) {										
 					
-		$serverVersion = $parameter['version'];			
 		$rev=$parameter['rev'];
 		$rep=$parameter['rep'];
-		
-		$_EXTKEY = 'nxcaretakerservices';		
-		@include(t3lib_extMgm::extPath('nxcaretakerservices', 'ext_emconf.php'));
-		$clientVersion = $EM_CONF['nxcaretakerservices']['version'];
-		
-		if($serverVersion == $clientVersion) return new tx_caretakerinstance_OperationResult(TRUE, 'ClientVersion is equal to the serverVersion. ' . $clientVersion);
+		$info=$parameter['info'];
 		
 		$dirname = PATH_site . 'typo3conf/ext/nxcaretakerservices/';
 		if(!is_dir($dirname)) return new tx_caretakerinstance_OperationResult(FALSE, $dirname .' not found.');			
 
 		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn ';
-		if($rep) $svnCommand = $svnCommand . ' co '. $rep . ' . ';
-		else $svnCommand = $svnCommand . ' up ';
-		if($rev) $svnCommand = $svnCommand . ' -r '. $rev;
-		$result = exec($svnCommand);
+		if($info){
+			$svnCommand = $svnCommand . 'info';
+			$output = array();
+			exec($svnCommand, $output);
+			$result = '<DIV>';
+			foreach($output as $line){
+				$result = $result . $line . '<br />';				
+			}
+			if($result == '<DIV>') $result = false;
+			else $result = $result . '</DIV>';
+		}
+		else{
+			if($rep) $svnCommand = $svnCommand . ' co '. $rep . ' . ';
+			else $svnCommand = $svnCommand . ' up ';
+			if($rev) $svnCommand = $svnCommand . ' -r '. $rev;
+			$result = exec($svnCommand);
+		}
 		if($result) return new tx_caretakerinstance_OperationResult(TRUE, $result);
 		else return new tx_caretakerinstance_OperationResult(FALSE, $svnCommand .' did not work.');
 	}

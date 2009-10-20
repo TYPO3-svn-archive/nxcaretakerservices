@@ -28,33 +28,27 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 	
 	public function runTest() {		
 		
-		$operation = array('GetExtensionVersion', array('extensionKey' => 'nxcaretakerservices'));
+		$operation = array('UpdateNxcaretakerservicesAction', array('info'=>'true'));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
-
 		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return $this->getFailedCommandResultTestResult($commandResult);
-		}
-		
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];
-		if ($operationResult->isSuccessful()) {
-			$extensionVersion = $operationResult->getValue();
-		} else {
-			$extensionVersion = FALSE;
+			return 'error '. $commandResult->getMessage();
 		}
 
-		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, 'Clientversion: ' . $extensionVersion);
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
+		
+		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0,  $message);
 
 		return $testResult;
 	}	
 	
 	public function versionUpdate($data = false) {
 
-		$_EXTKEY = 'nxcaretakerservices';		
-		@include(t3lib_extMgm::extPath('nxcaretakerservices', 'ext_emconf.php'));
-		
+	
 		$rev='';
 		$rep='';
 		if($data){
@@ -63,7 +57,7 @@ class tx_nxcaretakerservices_UpdateNxcaretakerservicesActionService extends tx_c
 			$rep = $data[1];			
 		}
 		
-		$operation = array('UpdateNxcaretakerservicesAction', array('version' => $EM_CONF['nxcaretakerservices']['version'], 'rev'=>$rev,'rep'=>$rep));
+		$operation = array('UpdateNxcaretakerservicesAction', array('rev'=>$rev,'rep'=>$rep));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
