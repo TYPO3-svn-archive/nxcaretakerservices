@@ -24,49 +24,16 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
 
-class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstance_RemoteTestServiceBase{
+class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {
-		/*
-		$blacklistedUsernames = explode(chr(10), $this->getConfigValue('blacklist'));
-
-		$operations = array();
-		foreach ($blacklistedUsernames as $username) {
-			$operations[] = array('GetRecord', array('table' => 'be_users', 'field' => 'username', 'value' => $username, 'checkEnableFields' => TRUE));
-		}
-
-		$commandResult = $this->executeRemoteOperations($operations);
-
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return $this->getFailedCommandResultTestResult($commandResult);
-		}
-
-		$usernames = array();
 		
-		$results = $commandResult->getOperationResults();
-		foreach ($results as $operationResult) {
-			if ($operationResult->isSuccessful()) {
-				$user = $operationResult->getValue();
-				if ($user !== FALSE) {
-					$usernames[] = $user['username'];
-				}
-			} else {
-				return $this->getFailedOperationResultTestResult($operationResult);
-			}
-		}
-
-		foreach ($blacklistedUsernames as $username) {
-			if (in_array($username, $usernames)) {
-				return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, 'User [' . $username . '] is blacklisted and should not be active.');
-			}
-		}*/
-
 		return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, '');
 	}
 	
 	public function Action($action,$ids)
 	{
-		$operation = array('GetBeusers', array('action' => $action,'ids' => $ids));
+		$operation = array('ExtensionManagement', array('action' => $action,'ids' => $ids));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -83,9 +50,9 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 	{
 		$Result="";
 		
-		if(substr($method, 0, 6) == 'Enable') 
+		if(substr($method, 0, 7) == 'svninfo') 
 		{			
-			$Result = $this->Action('enable',substr($method, 7));
+			$Result = $this->Action('svninfo',substr($method, 8));
 		}
 		if(substr($method, 0, 7) == 'Disable') 
 		{			
@@ -113,26 +80,32 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		
 	public function getView($service, $actionId) {
 		
-		$operation = array('GetBeusers', array());
+		$location_list = array('system','global','local');
+		
+		$operation = array('GetExtensionList', array('locations' => $location_list));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
-
-		$message ="[";
-		
-		$results = $commandResult->getOperationResults();
-		
 		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return 'error '. $commandResult->getMessage();
+			return $this->getFailedCommandResultTestResult($commandResult);
 		}
-		
-		$operationResult = $results[0]->getValue();
+
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];
+
+		if (!$operationResult->isSuccessful()) {
+			return  'error: Remote operation failed: ' . $operationResult->getValue();
+		} 
+
+		$extensionList = $operationResult->getValue();
+
+		$data ="[";
 				
-		foreach($operationResult as $row){
-			if($message != '[') $message = $message . ',';
-			$message = $message . $this->getRows($row);
+		foreach($extensionList as $extension){
+			if($data != '[') $data = $data . ',';
+			$data = $data . $this->getRows($extension);
 		}
-		$message = $message . ']';
+		$data = $data . ']';
 		
 		$grid = '
 	
@@ -140,36 +113,31 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         		id:"button-grid",
         		store: new Ext.data.Store({
             		reader: new Ext.data.ArrayReader({}, [
-       					{name: "uid", type: "int"},	
-            			{name: "username"},
-       					{name: "admin", type: "int"},
-       					{name: "disable", type: "int"},       					
-       					{name: "llogin"},
-       					{name: "email"},
-       					{name: "realName"}
+       					{name: "extKey"},	
+            			{name: "version"},
+       					{name: "installed"},
+       					{name: "secure"},       					
+       					{name: "scope"}       					
     					]),
             		data: 
-            			'.$message.'
+            			'.$data.'
             		
         			}),
-        		cm: new Ext.grid.ColumnModel([
-            			new Ext.grid.CheckboxSelectionModel(),
-    				{header: "ID", width: 4, sortable: true, dataIndex: "uid"},
-            		{header: "Username", width: 10, sortable: true, dataIndex: "username"},
-            		{header: "Name", width: 16, sortable: true, dataIndex: "realName"},
-            		{header: "is Admin", width: 6, sortable: false, dataIndex: "admin"},
-            		{header: "is disabled", width: 6, sortable: false, dataIndex: "disable"},            		
-            		{header: "Last Login", width: 12, sortable: true, dataIndex: "llogin"},
-            		{header: "Email", width: 16, sortable: true, dataIndex: "email"}
+        		cm: new Ext.grid.ColumnModel([            			
+    				{header: "Extensionkey", width: 7, sortable: true, dataIndex: "extKey"},
+            		{header: "Version", width: 3, sortable: true, dataIndex: "version"},
+            		{header: "is installed", width: 3, sortable: true, dataIndex: "installed"},
+            		{header: "is secure", width: 3, sortable: true, dataIndex: "secure"},
+            		{header: "Scope", width: 3, sortable: true, dataIndex: "scope"}
         			]),
-        		sm: new Ext.grid.CheckboxSelectionModel(),
+        		sm: new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
         		viewConfig: { forceFit:true },
         		columnLines: true,
         
         		buttons: [
         			{
             			text:"Refresh",
-            			tooltip:"Reload all users",
+            			tooltip:"Reload all extensions",
             			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler:	 function (){	
 
@@ -202,22 +170,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         		buttonAlign:"center",        		
         		
 		        tbar:[{
-        		    	text:"Enable",
-            			tooltip:"Enable all selected users",
+        		    	text:"SVN Info",
+            			tooltip:"Gets SVN Info, if exists",
             			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
-            					var selections = grid.getSelectionModel().getSelections();
-								var ids = "";
-								var count = selections.length;
-								var i = 0;
-            					while(i<count)
-            					{
-            						ids = ids + "," + selections[i].get("uid");
-            						i++;
-            					}
-            					
+            					var selection = grid.getSelectionModel().getSelected().get("extKey");
+								            					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
 								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
@@ -226,7 +186,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      										
+      										alert(response.responseText);
 																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
@@ -251,7 +211,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
                							service:   "'.$service.'",
-               							method: "Enable" + ids           							             							
+               							method: "svninfo" + "," + selection           							             							
             								}
         							});
     							}
@@ -620,7 +580,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         		
         		autoHeight      : true   ,
         		frame:true,
-        		title:"User management"
+        		title:"Extension management"
     		})
 		
 		';
@@ -629,9 +589,37 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 	}
 		
 	public function getRows($row) {
-		return  '["'.$row['uid'].'","'.$row['username'].'","'.$row['admin'].'","'.$row['disable'].'","'.$row['llogin'].'","'.$row['email'].'","'.$row['realName'].'"]';
+		$ter_info = $this->getExtensionTerInfos($row['ext_key'], $row['version']);
+		if ($ter_info) {
+			if ($ter_info['reviewstate'] > -1) {
+				$secure = 'reviewed';
+			}else{
+				$secure = 'unsecure';
+			}
+		}else{
+			$secure = 'unknown';
+		}
+		$scope = '';
+		if($row['scope']['system']){
+			$scope = 'system'; 
+		}
+		if($row['scope']['global']){
+			$scope = 'global'; 
+		}
+		if($row['scope']['local']){
+			$scope = 'local'; 
+		}
+		return  '["'.$row['ext_key'].'","'.$row['version'].'","'.($row['installed'] ? 'yes':'no').'","'.$secure.'","'.$scope.'"]';
 	}
 
+	public function getExtensionTerInfos( $ext_key, $ext_version ){
+		$ext_infos = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('extkey, version, reviewstate','cache_extensions','extkey = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_key,'cache_extensions' ).' AND version = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_version,'cache_extensions'), '', '' , 1 );
+		if (count($ext_infos)==1){
+			return $ext_infos[0];
+		} else {
+			return false;
+		}
+	}
 
 
 

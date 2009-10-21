@@ -99,6 +99,7 @@ if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Install Tool Action', 'create and delete the install tool');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_BackendUser',  'TYPO3 -> User management', 'enable an disable backend users');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UpdateNxcaretakerservices',  'TYPO3 -> Update nxcaretakerservices', 'If the nxcaretakerservices extension of the client is older than the servers one, this will update it.');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ExtensionManager',  'TYPO3 -> Extension Manager', 'Manage clients extensions.');
 	
 }
 
