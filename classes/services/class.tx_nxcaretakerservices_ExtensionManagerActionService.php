@@ -33,7 +33,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 	
 	public function Action($action,$ids)
 	{
-		$operation = array('ExtensionManagement', array('action' => $action,'ids' => $ids));
+		$operation = array('ExtensionManagement', array('action' => $action,'extkey' => $ids));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
