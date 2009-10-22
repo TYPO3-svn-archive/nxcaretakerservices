@@ -59,21 +59,37 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 		
 		$dirname = PATH_site . 'typo3conf/ext/'.$extkey.'/';
 		
-		switch ($action){
+		$retval = '';
 		
+		switch ($action){
 			case 'svninfo' :
 				$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn info';
 				exec($svnCommand, $output);
 				$result = 'SVN Info:';
 				foreach($output as $line){
-					$result = $result . '<br />' . $line;				
+					$result = $result . "\n" . $line;				
 				}
-				if($result == 'SVN Info:') $result = false;	
+				if($result == 'SVN Info:') $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
+				else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				break;
+			case 'uninstall' :
+				$result = $action;
+				$retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				break;
+			case 'delete' :
+				$result = $action;
+				$retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				break;
+			case 'update' :
+				$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn up';
+				exec($svnCommand, $output);
+				$result = exec($svnCommand);
+				if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
+				else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
 				break;
 		}
-		if($result) return new tx_caretakerinstance_OperationResult(TRUE, $result);
-		else return new tx_caretakerinstance_OperationResult(FALSE, $svnCommand .' did not work.');
 		
+		return $retval;
 		
 		
 		

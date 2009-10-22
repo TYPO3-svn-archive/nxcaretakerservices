@@ -54,25 +54,17 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 		{			
 			$Result = $this->Action('svninfo',substr($method, 8));
 		}
-		if(substr($method, 0, 7) == 'Disable') 
+		if(substr($method, 0, 9) == 'uninstall') 
 		{			
-			$Result = $this->Action('disable',substr($method, 8));
+			$Result = $this->Action('uninstall',substr($method, 10));
 		}
-		if(substr($method, 0, 5) == 'Admin') 
-		{			
-			$Result = $this->Action('enableAdmin',substr($method, 6));
-		}
-		if(substr($method, 0, 7) == 'NoAdmin') 
-		{			
-			$Result = $this->Action('disableAdmin',substr($method, 8));
-		}
-		if(substr($method, 0, 6) == 'Delete') 
+		if(substr($method, 0, 6) == 'delete') 
 		{			
 			$Result = $this->Action('delete',substr($method, 7));
 		}
-		if(substr($method, 0, 3) == 'Add') 
+		if(substr($method, 0, 6) == 'update') 
 		{			
-			$Result  = $this->Action('add',substr($method, 4));
+			$Result = $this->Action('update',substr($method, 7));
 		}
 		
 		return $Result;
@@ -111,6 +103,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 	
 		   new Ext.grid.GridPanel({
         		id:"button-grid",
+        		loadMask: true,
         		store: new Ext.data.Store({
             		reader: new Ext.data.ArrayReader({}, [
        					{name: "extKey"},	
@@ -123,7 +116,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			'.$data.'
             		
         			}),
-        		cm: new Ext.grid.ColumnModel([            			
+        		cm: new Ext.grid.ColumnModel([        			            			
     				{header: "Extensionkey", width: 7, sortable: true, dataIndex: "extKey"},
             		{header: "Version", width: 3, sortable: true, dataIndex: "version"},
             		{header: "is installed", width: 3, sortable: true, dataIndex: "installed"},
@@ -133,7 +126,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
         		sm: new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
         		viewConfig: { forceFit:true },
         		columnLines: true,
-        
+        		
         		buttons: [
         			{
             			text:"Refresh",
@@ -177,35 +170,11 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
             					var selection = grid.getSelectionModel().getSelected().get("extKey");
-								            					
-            					var viewpanel = Ext.getCmp("nxcaretakerAction");
-								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
-								viewpanel.doLayout();
-            					
+								
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      										alert(response.responseText);
-																	
-        						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
-           							success : function (response, opts){											
-      									           								
-        								var jsonData = Ext.util.JSON.decode(response.responseText);
-        																		
-										viewpanel.removeAll();
-										viewpanel.add(jsonData);
-										viewpanel.doLayout(); 	
-															       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
-               							service:   "'.$service.'" ,
-               							actionid:      "'.$actionId.'"        							               							             							
-            								}
-        							});          																       								       								
+      										Ext.MessageBox.alert("SVN Status", response.responseText);									       								       								
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
@@ -216,23 +185,15 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
         							});
     							}
 							}
-        			},  {
-        		    	text:"Disable",
-            			tooltip:"Disable all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'",
+        			},{
+        		    	text:"SVN Update",
+            			tooltip:"Execute a SVN update for the selected extension",
+            			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
-            					if(grid.getSelectionModel().hasSelection()){
-            					var selections = grid.getSelectionModel().getSelections();
-								var ids = "";
-								var count = selections.length;
-								var i = 0;
-            					while(i<count)
-            					{
-            						ids = ids + "," + selections[i].get("uid");
-            						i++;
-            					}
-            					
+            					if(grid.getSelectionModel().hasSelection()){            					
+            					var selection = grid.getSelectionModel().getSelected().get("extKey");
+																            					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
 								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
@@ -241,7 +202,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      										
+      										Ext.MessageBox.alert("SVN Status", response.responseText);
 																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
@@ -266,37 +227,30 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
                							service:   "'.$service.'",
-               							method: "Disable" + ids           							             							
+               							method: "update" + "," + selection           							             							
             								}
         							});
     							}
 							}
         			},"-",{
-        		    	text:"Enable Admin",
-            			tooltip:"Enable Admin to all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users_admin.gif', '', 1).'",
+        		    	text:"Uninstall",
+            			tooltip:"Uninstall the selected extension",
+            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
-            					var selections = grid.getSelectionModel().getSelections();
-								var ids = "";
-								var count = selections.length;
-								var i = 0;
-            					while(i<count)
-            					{
-            						ids = ids + "," + selections[i].get("uid");
-            						i++;
-            					}
-            					
+            					if(grid.getSelectionModel().getSelected().get("installed") == "no") return;
+            					var selection = grid.getSelectionModel().getSelected().get("extKey");
+																            					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
 								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
-            					
+								
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      										
+      										Ext.MessageBox.alert("SVN Status", response.responseText);
 																	
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
@@ -321,82 +275,24 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
                							service:   "'.$service.'",
-               							method: "Admin" + ids           							             							
-            								}
-        							});
-    							}
-							}
-        			},{
-        		    	text:"Disable Admin",
-            			tooltip:"Disable Admin to all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users.gif', '', 1).'",
-            			handler: 		function (){
-            					var grid = Ext.getCmp("button-grid");
-            					if(grid.getSelectionModel().hasSelection()){
-            					var selections = grid.getSelectionModel().getSelections();
-								var ids = "";
-								var count = selections.length;
-								var i = 0;
-            					while(i<count)
-            					{
-            						ids = ids + "," + selections[i].get("uid");
-            						i++;
-            					}
-            					
-            					var viewpanel = Ext.getCmp("nxcaretakerAction");
-								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
-								viewpanel.doLayout();
-            					
-        						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
-           							success : function (response, opts){											
-      										
-																	
-        						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
-           							success : function (response, opts){											
-      									           								
-        								var jsonData = Ext.util.JSON.decode(response.responseText);
-        								
-										viewpanel.removeAll();
-										viewpanel.add(jsonData);
-										viewpanel.doLayout(); 	
-															       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
-               							service:   "'.$service.'" ,
-               							actionid:      "'.$actionId.'"        							               							             							
-            								}
-        							});           																       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
-               							service:   "'.$service.'",
-               							method: "NoAdmin" + ids           							             							
+               							method: "uninstall" + "," + selection           							             							
             								}
         							});
     							}
 							}
         			},"-",{
             			text:"Delete",
-            			tooltip:"Delete the selected users",
+            			tooltip:"Delete the selected extension",
             			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
-            					var selections = grid.getSelectionModel().getSelections();
-								var ids = "";
-								var count = selections.length;
-								var i = 0;
-            					while(i<count)
-            					{
-            						ids = ids + "," + selections[i].get("uid");
-            						i++;
+            					if(grid.getSelectionModel().getSelected().get("installed") == "yes") {
+            						Ext.MessageBox.alert("Info", "Please uninstall the extension first!");
+            						return;
             					}
+            					var selection = grid.getSelectionModel().getSelected().get("extKey");
+								
             					Ext.MessageBox.confirm("Confirm", "Are you sure you want to do that?", function(btn)
             					{
             					if(btn == "yes"){
@@ -409,7 +305,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
            							success : function (response, opts){											
-      										
+      										Ext.MessageBox.alert("SVN Status", response.responseText);
 																		
         						Ext.Ajax.request({
            							url: tx.caretaker.back_path + "ajax.php",
@@ -434,15 +330,16 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
                							ajaxID: "tx_nxcaretakerservices::doaction",
                							node:   tx.caretaker.node_info.id,
                							service:   "'.$service.'",
-               							method: "Delete" + ids           							             							
+               							method: "delete" + "," + selection           							             							
             								}
         							});
         							}});
     							}
 							}		            
         			},{
-            			text:"Add User",
+            			text:"Add",
             			tooltip:"Add new user",
+            			disabled:true,
             			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");

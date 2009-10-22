@@ -15,6 +15,37 @@ $TYPO3_CONF_VARS['BE']['AJAX']['tx_nxcaretakerservices::doaction']    = 'EXT:nxc
 $TYPO3_CONF_VARS['BE']['AJAX']['tx_nxcaretakerservices::getActionButtons']    = 'EXT:nxcaretakerservices/classes/ajax/class.tx_nxcaretakerservices_Action.php:tx_nxcaretakerservices_Action->ajaxGetActionButtons';
 
 
-
+$TYPO3_CONF_VARS['EXTCONF']['caretaker']['additionalTabs']['actionTab'] = '{		
+    	    			id:"nxcaretakerAction",
+    	    			title:"Action",
+    	    			xtype    : "panel",
+    	    			width:450,    
+    	    			autoScroll: true,
+    	    			tbar: {	
+    	    				id			:"actionToolbar",	
+    	    				layout : "toolbar",
+    	    		            items :  []
+    	    			},
+    	    			defaults:{autoHeight: true},
+    	    			items:[],
+    	    			listeners: {activate:	function(tab){
+    	    				Ext.Ajax.request({
+    	    					url : tx.caretaker.back_path + "ajax.php",
+    	    					method : "GET",
+    	    					success : function(result, request) {
+    	    						var jsonData = Ext.util.JSON.decode(result.responseText);
+    	    						var tb = Ext.getCmp("actionToolbar");
+    	    						tb.removeAll();
+    	    						tb.add( jsonData );
+    	    						tb.doLayout();
+    	    					},
+    	    						params: 
+    	    							{ 
+    	    								ajaxID: "tx_nxcaretakerservices::getActionButtons",
+    	    								node:  tx.caretaker.node_info.id 
+    	    							}
+    	    				}); }
+    	    			}
+    	            }';
 
 ?>

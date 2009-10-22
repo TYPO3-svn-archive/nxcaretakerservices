@@ -107,7 +107,7 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 		
 	public function getView($service, $actionId) {
 		
-		$message ='[{text:"delete",
+		$message ='[{text:"disable",
 						icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
 						handler:
 							function (){
@@ -132,7 +132,7 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
             								}
         							});
     						}
-					},{text:"create",
+					},{text:"enable",
 						icon    : "../res/icons/test.png",
 						handler:
 							function (){
