@@ -22,8 +22,16 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_OperationResult.php'));
+//define('TYPO3_MOD_PATH', '../typo3conf/');
+$BACK_PATH='../../../../../typo3/';
 
+$GLOBALS['LANG'] = t3lib_div::makeInstance('language');
+$GLOBALS['LANG']->init($BE_USER->uc['lang']);
+
+//require_once (PATH_typo3 . 'init.php');
+require_once(PATH_typo3 . 'mod/tools/em/class.em_index.php');
+require_once(PATH_typo3 . 'template.php');
+require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_OperationResult.php'));
 
 /**
  * An Operation that returns the first record matched by a field name and value as an array (excluding protected record details like be_user password).
@@ -59,7 +67,7 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 		
 		$dirname = PATH_site . 'typo3conf/ext/'.$extkey.'/';
 		
-		$retval = '';
+		$retval = new tx_caretakerinstance_OperationResult(false, 'error');
 		
 		switch ($action){
 			case 'svninfo' :
@@ -72,13 +80,25 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 				if($result == 'SVN Info:') $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
 				else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
 				break;
-			case 'uninstall' :
-				$result = $action;
-				$retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+			case 'uninstall' :				
+				$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
+				$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
+				$extManager->doc = t3lib_div::makeInstance('template');
+				$extlist=$extManager->getInstalledExtensions();
+				$list = reset($extlist);
+				$newExtList = $extManager->removeExtFromList($extkey, $list);
+				if($newExtList === -1) $retval = new tx_caretakerinstance_OperationResult(TRUE, $extManager->content);	
+				else {
+					$extManager->writeNewExtensionList($newExtList);							
+					$retval = new tx_caretakerinstance_OperationResult(TRUE, $newExtList);
+				}				
 				break;
 			case 'delete' :
-				$result = $action;
-				$retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				if(!file_exists(PATH_site . 'typo3conf/backup/')) t3lib_div::mkdir(PATH_site . 'typo3conf/backup/');
+				$backupdir = PATH_site . 'typo3conf/backup/'.$extkey.'/';
+				$result = rename($dirname, $backupdir);				
+				if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Extension could not be deleted.');
+				else $retval = new tx_caretakerinstance_OperationResult(TRUE, 'Extension was deleted. (backuped)');
 				break;
 			case 'update' :
 				$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn up';

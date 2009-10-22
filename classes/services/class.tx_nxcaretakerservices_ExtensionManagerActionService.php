@@ -24,6 +24,7 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
 
+
 class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {
@@ -55,7 +56,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 			$Result = $this->Action('svninfo',substr($method, 8));
 		}
 		if(substr($method, 0, 9) == 'uninstall') 
-		{			
+		{
 			$Result = $this->Action('uninstall',substr($method, 10));
 		}
 		if(substr($method, 0, 6) == 'delete') 
@@ -79,7 +80,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 
 		$commandResult = $this->executeRemoteOperations($operations);
 		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return $this->getFailedCommandResultTestResult($commandResult);
+			return $commandResult;
 		}
 
 		$results = $commandResult->getOperationResults();
@@ -169,6 +170,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
+            					if(grid.getSelectionModel().getSelected().get("scope") == "system" || grid.getSelectionModel().getSelected().get("scope") == "global") return;  
             					var selection = grid.getSelectionModel().getSelected().get("extKey");
 								
         						Ext.Ajax.request({
@@ -191,7 +193,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
-            					if(grid.getSelectionModel().hasSelection()){            					
+            					if(grid.getSelectionModel().hasSelection()){   
+            					if(grid.getSelectionModel().getSelected().get("scope") == "system" || grid.getSelectionModel().getSelected().get("scope") == "global") return;         					
             					var selection = grid.getSelectionModel().getSelected().get("extKey");
 																            					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
@@ -239,6 +242,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
+            					//if(grid.getSelectionModel().getSelected().get("scope") == "system" || grid.getSelectionModel().getSelected().get("scope") == "global") return;  
             					if(grid.getSelectionModel().getSelected().get("installed") == "no") return;
             					var selection = grid.getSelectionModel().getSelected().get("extKey");
 																            					
@@ -287,6 +291,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
+            					if(grid.getSelectionModel().getSelected().get("scope") == "system" || grid.getSelectionModel().getSelected().get("scope") == "global") return;  
             					if(grid.getSelectionModel().getSelected().get("installed") == "yes") {
             						Ext.MessageBox.alert("Info", "Please uninstall the extension first!");
             						return;
