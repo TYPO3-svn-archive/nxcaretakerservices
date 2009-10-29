@@ -6,18 +6,14 @@
 	<ROOT>
 		<TCEforms> 
 			<sheetTitle>Default</sheetTitle> 
-		</TCEforms> 
-		<type>array</type>
+		</TCEforms>	
+			<type>array</type>
 		<el>
-			<repurl>
+			<blacklist>
 				<TCEforms>
-					<label>TER Url</label>
-					<config>
-						<type>input</type>
-						<size>30</size>
-					</config>
+					<label>none</label>					
 				</TCEforms>
-			</repurl>
-		</el>
+			</blacklist>
+		</el>		
 	</ROOT>
 </T3DataStructure>

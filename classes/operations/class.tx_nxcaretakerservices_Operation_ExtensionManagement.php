@@ -42,18 +42,6 @@ require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caret
  * @subpackage	tx_caretakerinstance
  */
 class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretakerinstance_IOperation {
-
-	/**
-	 * An array of tables and table fields that should be cleared before
-	 * sending.
-	 * @var array
-	 */
-	protected $protectedFieldsByTable = array(
-		'be_users' => array('password', 'uc'),
-		'fe_users' => array('password')
-	);
-
-	protected $implicitFields = array('uid', 'pid', 'deleted', 'hidden');
 	
 	/**
 	 * 
@@ -71,141 +59,151 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 		
 		switch ($action){
 			case 'svninfo' :
-				$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn info';
-				exec($svnCommand, $output);
-				$result = 'SVN Info:';
-				foreach($output as $line){
-					$result = $result . "\n" . $line;				
-				}
-				if($result == 'SVN Info:') $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
-				else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				$retval = $this->getSVNInfo($dirname);
 				break;
-			case 'uninstall' :				
-				$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
-				$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
-				$extManager->doc = t3lib_div::makeInstance('template');
-				$extlist=$extManager->getInstalledExtensions();
-				$list = reset($extlist);
-				$newExtList = $extManager->removeExtFromList($extkey, $list);
-				if($newExtList === -1) $retval = new tx_caretakerinstance_OperationResult(TRUE, $extManager->content);	
-				else {
-					$extManager->writeNewExtensionList($newExtList);							
-					$retval = new tx_caretakerinstance_OperationResult(TRUE, $newExtList);
-				}				
+			case 'uninstall' :			
+				$retval = $this->uninstallExtension($extkey);
+				break;
+			case 'install' :			
+				$retval = $this->installExtension($extkey);
 				break;
 			case 'delete' :
-				if(!file_exists(PATH_site . 'typo3conf/backup/')) t3lib_div::mkdir(PATH_site . 'typo3conf/backup/');
-				$backupdir = PATH_site . 'typo3conf/backup/'.$extkey.'/';
-				$result = rename($dirname, $backupdir);				
-				if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Extension could not be deleted.');
-				else $retval = new tx_caretakerinstance_OperationResult(TRUE, 'Extension was deleted. (backuped)');
+				$retval = $this->deleteAndBackupExtension($extkey, $dirname);
 				break;
 			case 'update' :
-				$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn up';
-				exec($svnCommand, $output);
-				$result = exec($svnCommand);
-				if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
-				else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+				$retval = $this->updateExtensionBySVN($dirname);
+				break;
+			case 'checkout' :
+				$retval = $this->getExtensionFromSVN($extkey);
+				break;
+			case 'fetch' :
+				$retval = $this->getExtensionFromTER($extkey);
+				break;
+			case 'databaseUpdate' :
+				$retval = $this->updateDatabase($extkey);
 				break;
 		}
 		
 		return $retval;
 		
-		
-		
-		$table = 'be_users';//$parameter['table'];
-		$field = 'username';//$parameter['field'];
-		//$value = $parameter['value'];
-		
-		//$checkEnableFields = $parameter['checkEnableFields'] == TRUE;
-		
-		$this->includeTCA();
-		
-		if (!isset($GLOBALS['TCA'][$table])) {
-			return new tx_caretakerinstance_OperationResult(FALSE, 'Table [' . $table . '] not found in the TCA');
-		}
-		t3lib_div::loadTCA($table);
-		if (!isset($GLOBALS['TCA'][$table]['columns'][$field]) ) {
-			return new tx_caretakerinstance_OperationResult(FALSE, 'Field [' . $field . '] of table [' . $table . '] not found in the TCA');
-		}
-		
-		if($action = $parameter['action'])
-		{
-			$ids = Explode(',',$parameter['ids']);
-			if($action == 'enable')
-			{				
-				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('disable'=>0) );
-				}
-			}
-			if($action == 'disable')
-			{				
-				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('disable'=>1) );
-				}
-			}
-			if($action == 'enableAdmin')
-			{				
-				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('admin'=>1) );
-				}
-			}
-			if($action == 'disableAdmin')
-			{				
-				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('admin'=>0) );
-				}
-			}
-			if($action == 'delete')
-			{				
-				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array($GLOBALS['TCA'][$table]['ctrl']['delete']=>1) );
-				}
-			}
-			if($action == 'add')
-			{	
-				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, array('username'=>$ids[0], 'password'=>md5($ids[1]),'realName'=>$ids[2],'email'=>$ids[3]) );
-			}
-			
-			return new tx_caretakerinstance_OperationResult(TRUE, 'ids are '.$action);
-		}
-		else
-		{
-		
-			$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'uid, username, admin, disable, FROM_UNIXTIME(lastlogin) AS llogin, email, realName',
-				$table,
-				 $GLOBALS['TCA'][$table]['ctrl']['delete'].'=0');
-			
-			if ($result) {
-				
-				$rows = array();
-				
-				while($record = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result))
-				{
-					if ($record !== FALSE) {				
-						$rows[] = $record;
-					}
-				}
-				return new tx_caretakerinstance_OperationResult(TRUE, $rows);
-			} else {
-				return new tx_caretakerinstance_OperationResult(FALSE, 'Error when executing SQL: [' . $GLOBALS['TYPO3_DB']->sql_error() . ']');
-			}
-		}
 	}
-
+	
+	protected function getSVNInfo($dirname) {
+		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn info';
+		exec($svnCommand, $output);
+		$result = 'SVN Info:';
+		foreach($output as $line){
+			$result = $result . "\n" . $line;				
+		}
+		if($result == 'SVN Info:') $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
+		else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+		
+		return $retval;
+	}
+	
+	protected function uninstallExtension($extkey) {
+		$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
+		$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
+		$extManager->doc = t3lib_div::makeInstance('template');
+		$extlist = $extManager->getInstalledExtensions();
+		$list = reset($extlist);
+		
+		$newExtList = $extManager->removeExtFromList($extkey, $list);
+		if($newExtList === -1) $retval = new tx_caretakerinstance_OperationResult(TRUE, $extManager->content);	
+		else {
+			$extManager->writeNewExtensionList($newExtList);							
+			$retval = new tx_caretakerinstance_OperationResult(TRUE, 'Extension ' . $extkey . ' uninstalled.');
+		}			
+		
+		return $retval;
+	}
+	
+	protected function installExtension($extkey) {
+		$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
+		$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
+		$extManager->doc = t3lib_div::makeInstance('template');
+		$extlist = $extManager->getInstalledExtensions();
+		$list = reset($extlist);
+		
+		$extManager->CMD['load'] = true;
+		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');	
+		$extManager->CMD['standAlone']	= true;	
+		
+		$extManager->showExtDetails($extkey);
+		$retval = new tx_caretakerinstance_OperationResult(FALSE,  $extManager->content);
+		if (ereg( 'DATABASE NEEDS TO BE UPDATED', $extManager->content)) {
+			$result = 'Before the extension can be installed the database needs to be updated with new tables or fields.';
+			if (ereg( 'This extension requests the cache to be cleared when it is installed', $extManager->content)) $result = $result . '<br /><br />This extension requests the cache to be cleared when it is installed.';
+			if (ereg( 'The extension requires the upload folder ', $extManager->content)) {
+				$result = $result . '<br /><br />The extension requires the upload folder:';
+				$result = $result . '<br />' . PATH_site.$extManager->ulFolder($extkey);
+				if ($list[$extkey]['EM_CONF']['createDirs'])	{
+					$createDirs = array_unique(t3lib_div::trimExplode(',',$list[$extkey]['EM_CONF']['createDirs'],1));
+					foreach($createDirs as $crDir)	{
+						$result = $result . '<br />' . PATH_site.$crDir;
+					}
+					$result = $result . '<br /> DO NOT UPDATE!'; //TODO: make this work
+				}
+			}
+			$retval = new tx_caretakerinstance_OperationResult(FALSE,  $result);
+		}
+		if (ereg( 'Dependency Error', $extManager->content)) {	
+			$result = $extManager->content;
+			$result = substr($result, strpos($result, '<!-- Section content -->')+25,strpos($result, '<br />&nbsp;&nbsp;&nbsp;&nbsp;')-(strpos($result, '<!-- Section content -->')+25));
+			$retval = new tx_caretakerinstance_OperationResult(FALSE,  'Dependency Error. '.$result);				
+		}
+		if (ereg( 'The extension has been installed', $extManager->content)) $retval = new tx_caretakerinstance_OperationResult(TRUE,  'This extension has been installed.');
+		return $retval;
+	}
+	
+	protected function updateDatabase($extkey) {
+		$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
+		$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
+		$extManager->doc = t3lib_div::makeInstance('template');
+		$extManager->typePaths = Array (
+			'S' => TYPO3_mainDir.'sysext/',
+			'G' => TYPO3_mainDir.'ext/',
+			'L' => 'typo3conf/ext/'
+		);
+		$extManager->typeBackPaths = Array (
+			'S' => '../../../',
+			'G' => '../../../',
+			'L' => '../../../../'.TYPO3_mainDir
+		);
+		$this->includeTCA();
+		$extlist = $extManager->getInstalledExtensions();
+		$list = reset($extlist);
+		
+		$extManager->CMD['load'] = true;
+		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');	
+		$extManager->CMD['standAlone']	= true;	
+				
+		$result = $extManager->checkDBupdates($extkey,$list[$extkey]);
+		
+		$statementkeys = array();		
+		if(preg_match_all('/name="TYPO3_INSTALL\[database_update\]\[([0-9a-f]{32})\]"/', $result, $statementkeys) > 0) {
+			$_GET['TYPO3_INSTALL']['database_update'] = array_fill_keys($statementkeys[1], 1);
+		}
+		$_POST['_uploadfolder'] = 1;
+		$_POST['_clear_all_cache'] = 1;		
+		$_GET['_do_install'] = 1;
+		$_GET['_clrCmd'] = 1;	
+		 	
+		$extManager->showExtDetails($extkey);
+		
+		$retval = new tx_caretakerinstance_OperationResult(FALSE,  $extManager->content);
+		if (ereg( 'The extension has been installed', $extManager->content)) $retval = new tx_caretakerinstance_OperationResult(TRUE,  'This extension has been installed.');
+		
+		return $retval;
+	}
+			
 	protected function includeTCA() {
 		require_once(PATH_tslib.'class.tslib_fe.php');
-		/*
+
+			// require some additional stuff in TYPO3 4.1
 		require_once(PATH_t3lib.'class.t3lib_cs.php');
 		require_once(PATH_t3lib.'class.t3lib_userauth.php');
 		require_once(PATH_tslib.'class.tslib_feuserauth.php');
-		*/
 
 			// Make new instance of TSFE object for initializing user:
 		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
@@ -213,45 +211,96 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 		$TSFE->includeTCA();
 	}
 	
-	/**
-	 * A simplified enableFields function (partially copied from sys_page) that
-	 * can be used without a full TSFE environment. It doesn't / can't check
-	 * fe_group constraints or custom hooks.
-	 * 
-	 * @param $table
-	 * @return string The query to append
-	 */
-	function enableFields($table) {
-		$ctrl = $GLOBALS['TCA'][$table]['ctrl'];
-		$query = '';
-		if (is_array($ctrl)) {
-				// Delete field check:
-			if ($ctrl['delete']) {
-				$query .= ' AND ' . $table . '.' . $ctrl['delete'] . ' = 0';
-			}
-
-				// Filter out new place-holder records in case we are NOT in a versioning preview (that means we are online!)
-			if ($ctrl['versioningWS']) {
-				$query .=' AND ' . $table . '.t3ver_state <= 0'; // Shadow state for new items MUST be ignored!
-			}
-
-				// Enable fields:
-			if (is_array($ctrl['enablecolumns']))	{
-				if ($ctrl['enablecolumns']['disabled']) {
-					$field = $table . '.' . $ctrl['enablecolumns']['disabled'];
-					$query .= ' AND ' . $field . ' = 0';
-				}
-				if ($ctrl['enablecolumns']['starttime']) {
-					$field = $table.'.'.$ctrl['enablecolumns']['starttime'];
-					$query .= ' AND (' . $field . ' <= ' . time() . ')';
-				}
-				if ($ctrl['enablecolumns']['endtime']) {
-					$field = $table . '.' . $ctrl['enablecolumns']['endtime'];
-					$query .= ' AND (' . $field . ' = 0 OR ' . $field . ' > ' . time() . ')';
-				}
-			}
-		}
-		return $query;
+	protected function deleteAndBackupExtension($extkey, $dirname) {
+		if(!file_exists(PATH_site . 'typo3conf/backup/')) t3lib_div::mkdir(PATH_site . 'typo3conf/backup/');
+		$backupdir = PATH_site . 'typo3conf/backup/'.$extkey.'/';
+		if(file_exists($backupdir)) $this->unlinkRecursive($backupdir);
+		$result = rename($dirname, $backupdir);				
+		if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Extension could not be deleted.');
+		else $retval = new tx_caretakerinstance_OperationResult(TRUE, 'Extension was deleted. (backuped)');
+		return $retval;
+	}
+	
+	protected function updateExtensionBySVN($dirname) {
+		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn up';				
+		$result = exec($svnCommand);
+		if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.');
+		else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+		return $retval;
+	}
+	
+	protected function getExtensionFromSVN($extkey) {
+		$data = split(',', $extkey);
+		$extkey = $data[0];
+		$rep = $data[1];			
+		$dirname = PATH_site . 'typo3conf/ext/'.$extkey.'/';
+		if(!file_exists($dirname))	t3lib_div::mkdir($dirname);
+		$svnCommand = 'cd ' . $dirname . ' && /usr/bin/svn co ' . $rep . ' .';				
+		$result = exec($svnCommand);
+		if(!$result) $retval = new tx_caretakerinstance_OperationResult(FALSE, 'Not in SVN repository or SVN version too old.'.$svnCommand);
+		else $retval = new tx_caretakerinstance_OperationResult(TRUE, $result);
+		return $retval;
+	}
+	
+	protected function getExtensionFromTER($extkey) {
+		$data = split(',', $extkey);
+		$extkey = $data[0];
+		$version = $data[1];	
+		$rep_url = $data[2];		
+		
+		$extManager = t3lib_div::makeInstance('SC_mod_tools_em_index');			
+		$extManager->requiredExt = t3lib_div::trimExplode(',',$TYPO3_CONF_VARS['EXT']['requiredExt'],1);
+		$extManager->doc = t3lib_div::makeInstance('template');				
+		
+		$extManager->typePaths = Array (
+			'S' => TYPO3_mainDir.'sysext/',
+			'G' => TYPO3_mainDir.'ext/',
+			'L' => 'typo3conf/ext/'
+		);
+		$extManager->typeBackPaths = Array (
+			'S' => '../../../',
+			'G' => '../../../',
+			'L' => '../../../../'.TYPO3_mainDir
+		);
+		$extManager->MOD_SETTINGS['rep_url'] = $rep_url;
+		$extManager->terConnection = t3lib_div::makeInstance('SC_mod_tools_em_terconnection');
+		$extManager->terConnection->emObj = $extManager;
+		$extManager->terConnection->wsdlURL = $GLOBALS['TYPO3_CONF_VARS']['EXT']['em_wsdlURL'];
+		$extManager->xmlhandler = t3lib_div::makeInstance('SC_mod_tools_em_xmlhandler');
+		$extManager->xmlhandler->emObj = $extManager;
+		$extManager->xmlhandler->useUnchecked = $extManager->MOD_SETTINGS['display_unchecked'];
+		$extManager->xmlhandler->useObsolete = $extManager->MOD_SETTINGS['display_obsolete'];
+		
+		$result = $extManager->importExtFromRep($extkey, $version,'L');
+		if (ereg( 'SUCCESS', $extManager->content))$retval = new tx_caretakerinstance_OperationResult(TRUE, 'The extension was imported.');
+		else $retval = new tx_caretakerinstance_OperationResult(TRUE, $extManager->content);	
+		
+		return $retval;		
+	}
+	
+	protected function unlinkRecursive($dir)
+	{
+	    if(!$dh = @opendir($dir))
+	    {
+	        return;
+	    }
+	    while (false !== ($obj = readdir($dh)))
+	    {
+	        if($obj == '.' || $obj == '..')
+	        {
+	            continue;
+	        }
+	
+	        if (!@unlink($dir . '/' . $obj))
+	        {
+	            $this->unlinkRecursive($dir.'/'.$obj, true);
+	        }
+	    }
+	
+	    closedir($dh);
+	    @rmdir($dir);
+	   
+	    return;
 	}
 }
 ?>

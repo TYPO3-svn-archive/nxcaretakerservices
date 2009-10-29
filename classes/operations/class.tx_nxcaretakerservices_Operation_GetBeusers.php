@@ -55,11 +55,8 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 	public function execute($parameter = array()) {
 		
 		
-		$table = 'be_users';//$parameter['table'];
-		$field = 'username';//$parameter['field'];
-		//$value = $parameter['value'];
-		
-		//$checkEnableFields = $parameter['checkEnableFields'] == TRUE;
+		$table = 'be_users';
+		$field = 'username';
 		
 		$this->includeTCA();
 		
@@ -71,50 +68,92 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			return new tx_caretakerinstance_OperationResult(FALSE, 'Field [' . $field . '] of table [' . $table . '] not found in the TCA');
 		}
 		
+		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
+		$GLOBALS['BE_USER']->user['admin'] = true;
+		
+		$tce = t3lib_div::makeInstance('t3lib_TCEmain');							
+		$tce->stripslashes_values = 0;		
+		
 		if($action = $parameter['action'])
 		{
 			$ids = Explode(',',$parameter['ids']);
 			if($action == 'enable')
 			{				
 				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('disable'=>0) );
+				{					
+					$data = array($table => array($id=>array('disable'=>0)));
+				
+			    	$tce->start($data,array());				
+			    	$tce->process_datamap();
 				}
 			}
 			if($action == 'disable')
 			{				
 				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('disable'=>1) );
+				{					
+					$data = array($table => array($id=>array('disable'=>1)));
+				
+			    	$tce->start($data,array());				
+			    	$tce->process_datamap();
 				}
 			}
 			if($action == 'enableAdmin')
 			{				
 				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('admin'=>1) );
+				{					
+					$data = array($table => array($id=>array('admin'=>1)));
+				
+			    	$tce->start($data,array());				
+			    	$tce->process_datamap();
 				}
 			}
 			if($action == 'disableAdmin')
-			{				
+			{	
+
 				foreach($ids as $id)
-				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array('admin'=>0) );
+				{					
+					$data = array($table => array($id=>array('admin'=>0)));
+				
+			    	$tce->start($data,array());				
+			    	$tce->process_datamap();
 				}
 			}
 			if($action == 'delete')
 			{				
 				foreach($ids as $id)
 				{
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,'uid = '.$id,  array($GLOBALS['TCA'][$table]['ctrl']['delete']=>1) );
+					$cmd = array($table => array($id=>array('delete'=>1)));
+				
+			    	$tce->start(array(), $cmd);				
+			    	$tce->process_cmdmap();
 				}
 			}
 			if($action == 'add')
 			{	
-				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, array('username'=>$ids[0], 'password'=>md5($ids[1]),'realName'=>$ids[2],'email'=>$ids[3]) );
+				$username = $parameter['params']['addusername'];
+				$password = $parameter['params']['addpassword'];
+				$name = $parameter['params']['addname'];
+				$email = $parameter['params']['addemail'];
+				
+				$data = array($table => array('NEW'=>array( "pid" => "0", 'username'=>$username,'password'=>$password,'realName'=>$name,'email'=>$email)));	
+				
+				$tce->start($data,array());				
+		    	$tce->process_datamap();
+			}
+			if($action == 'reset')
+			{					
+				$password = $parameter['params'];
+				foreach($ids as $id)
+				{
+					$data = array($table => array($id=>array('password'=>$password)));
+					
+					$tce->start($data,array());				
+		    		$tce->process_datamap();
+				}
 			}
 			
-			return new tx_caretakerinstance_OperationResult(TRUE, 'ids are '.$action);
+				
+			return new tx_caretakerinstance_OperationResult(TRUE,'ids are '.$action);
 		}
 		else
 		{
@@ -140,14 +179,14 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			}
 		}
 	}
-
+	
 	protected function includeTCA() {
 		require_once(PATH_tslib.'class.tslib_fe.php');
-		/*
+		
 		require_once(PATH_t3lib.'class.t3lib_cs.php');
 		require_once(PATH_t3lib.'class.t3lib_userauth.php');
 		require_once(PATH_tslib.'class.tslib_feuserauth.php');
-		*/
+		
 
 			// Make new instance of TSFE object for initializing user:
 		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');

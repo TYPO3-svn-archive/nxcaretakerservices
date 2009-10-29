@@ -146,7 +146,7 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 		$test_result_repository = tx_caretaker_TestResultRepository::getInstance();
 		$instance = $this->getInstance();
 				
-		$test_service = t3lib_div::makeInstanceService('caretaker_test_service',$this->test_service_type);
+		$test_service = t3lib_div::makeInstanceService('nxcaretakerservices_action_service',$this->test_service_type);
 		$test_service->setInstance( $this->getInstance() );
 		$test_service->setConfiguration($this->test_service_configuration);
 		
@@ -277,7 +277,7 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 	 */
 	public function getValueDescription() {
 		
-		$test_service = t3lib_div::makeInstanceService('caretaker_test_service',$this->test_service_type);
+		$test_service = t3lib_div::makeInstanceService('nxcaretakerservices_action_service',$this->test_service_type);
 		
 		if ($test_service){
 			return $test_service->getValueDescription();
@@ -289,6 +289,11 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 	public function getServiceType() {
 		
 		return $this->test_service_type;
+	}
+	
+	public function getServiceConfiguration() {
+		
+		return $this->test_service_configuration;
 	}
 	
 	/**

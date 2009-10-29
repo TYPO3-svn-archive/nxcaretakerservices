@@ -39,7 +39,8 @@ if($confArray['enableServerExt'])
 		include_once(t3lib_extMgm::extPath('caretaker') . 'classes/class.tx_caretaker_ServiceHelper.php');
 			
 		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Check for an open Install Tool', 'Look for ENABLE_INSTALL_TOOL');
-		
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UnsecureEncryptionKey',  'TYPO3 -> Check for an unsecure encryption key', 'compare it with a blacklist');
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'test password', '');
 	}
 
 	t3lib_div::loadTCA('tx_caretaker_instance');

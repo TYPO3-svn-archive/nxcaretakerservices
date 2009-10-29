@@ -28,28 +28,73 @@ class tx_nxcaretakerservices_ActionTestTestService extends tx_caretakerinstance_
 	
 	public function runTest() {		
 		
-		$operation = array('GetInstallTool', array());
-		$operations = array($operation);
-
-		$commandResult = $this->executeRemoteOperations($operations);
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return $this->getFailedCommandResultTestResult($commandResult);
-		}
-
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];		
- 		
-		$message =  'testaction (GetInstallTool)';
+//		$operation = array('GetInstallTool', array());
+//		$operations = array($operation);
+//
+//		$commandResult = $this->executeRemoteOperations($operations);
+//		if (!$this->isCommandResultSuccessful($commandResult)) {
+//			return $this->getFailedCommandResultTestResult($commandResult);
+//		}
+//
+//		$results = $commandResult->getOperationResults();
+//		$operationResult = $results[0];		
+// 		
+//		$message =  'testaction (GetInstallTool)';
+//		
+//		if (!$operationResult->isSuccessful()) {	
+//			
+//			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
+//		}
 		
-		if (!$operationResult->isSuccessful()) {	
-			
-			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
-		}
+		$table = 'be_users';//$parameter['table'];
+		$field = 'username';//$parameter['field'];
+		$test = 'abc';
+	//	$test = $this->evalPassword($test);
+		
+//		$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, array('username'=>'test', 'password'=>$test,'realName'=>'test','email'=>'test@netlogix.de') );
+		
+		
+//		foreach($dataStruct['ROOT']['el'] as $key => $dsConf)
+//		{
+//			$result = $result . $dsConf['TCEforms']['config']['eval'] . ", \n";
+//		}
 
-		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
+		$data = array('be_users' => array('NEWuser'=>array('username'=>'test', 'password'=>$test,'realName'=>'test','email'=>'test@netlogix.de')));
+		
+		$this->includeTCA();
+		
+		$tce = t3lib_div::makeInstance('t3lib_TCEmain');
+		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
+		$GLOBALS['BE_USER']->user['uid'] = 9999;
+		$GLOBALS['BE_USER']->user['username'] = 'tempAdmin';
+		$GLOBALS['BE_USER']->user['admin'] = true;
+   	 	$tce->stripslashes_values = 0;
+
+    	$tce->start($data,array());
+		$tce->BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');
+		$tce->BE_USER->user['admin'] = 1;
+    	$tce->process_datamap();
+		
+		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0,'');
 
 		return $testResult;
 	}	
+	
+	protected function includeTCA() {
+		require_once(PATH_tslib.'class.tslib_fe.php');
+
+			// require some additional stuff in TYPO3 4.1
+		require_once(PATH_t3lib.'class.t3lib_cs.php');
+		require_once(PATH_t3lib.'class.t3lib_userauth.php');
+		require_once(PATH_tslib.'class.tslib_feuserauth.php');
+
+			// Make new instance of TSFE object for initializing user:
+		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
+		$TSFE = new $temp_TSFEclassName($TYPO3_CONF_VARS,0,0);
+		$TSFE->includeTCA();
+	}
+	
+
 	public function getValueDescription() {
 		return 'testaction';
 	}

@@ -33,7 +33,7 @@ class tx_nxcaretakerservices_ActionServiceHelper {
 	 */
 	public function getAllCaretakerServices() {
 		global $T3_SERVICES;
-		return $T3_SERVICES['caretaker_test_service'];
+		return $T3_SERVICES['nxcaretakerservices_action_service'];
 	}
 		
 		
@@ -55,7 +55,7 @@ class tx_nxcaretakerservices_ActionServiceHelper {
 			// Register test service
 		t3lib_extMgm::addService(
 			'nxcaretakerservices',
-			'caretaker_test_service',
+			'nxcaretakerservices_action_service',
 			$key,	
 			array(
 				'title' => $title,

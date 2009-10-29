@@ -24,6 +24,7 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
 
+
 class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {
@@ -64,9 +65,9 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, '');
 	}
 	
-	public function Action($action,$ids)
+	public function Action($action,$ids, $params)
 	{
-		$operation = array('GetBeusers', array('action' => $action,'ids' => $ids));
+		$operation = array('GetBeusers', array('action' => $action,'ids' => $ids, 'params'=>$params));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -79,8 +80,9 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		return $operationResult;
 	}
 	
-	public function doAction($method)
+	public function doAction($params, &$ajaxObj)
 	{
+		$method = t3lib_div::_GP('method');
 		$Result="";
 		
 		if(substr($method, 0, 6) == 'Enable') 
@@ -105,13 +107,29 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		}
 		if(substr($method, 0, 3) == 'Add') 
 		{			
-			$Result  = $this->Action('add',substr($method, 4));
+			$addusername = t3lib_div::_GP('addusername');
+			$addpassword = t3lib_div::_GP('addpassword');
+			$addname = t3lib_div::_GP('addname');
+			$addemail = t3lib_div::_GP('addemail');
+			$Result  = $this->Action('add','',array('addusername'=>$addusername,'addpassword'=>$addpassword,'addname'=>$addname,'addemail'=>$addemail));
+		}
+		if(substr($method, 0, 5) == 'reset') 
+		{						
+			$password = t3lib_div::_GP('password');			
+			$Result  = $this->Action('reset',substr($method, 6),$password);
 		}
 		
 		return $Result;
 	}
 		
-	public function getView($service, $actionId) {
+	public function getView($params, &$ajaxObj) {
+		
+			
+		
+		$node_id = t3lib_div::_GP('node');
+		$back_path = t3lib_div::_GP('back_path');
+		$service = t3lib_div::_GP('service');
+		$actionId = t3lib_div::_GP('actionid');
 		
 		$operation = array('GetBeusers', array());
 		$operations = array($operation);
@@ -175,11 +193,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();	
 								
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -191,7 +209,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -204,7 +223,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		        tbar:[{
         		    	text:"Enable",
             			tooltip:"Enable all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
@@ -220,16 +239,16 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
             					
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       										
 																	
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -241,7 +260,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -249,7 +269,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'",
                							method: "Enable" + ids           							             							
             								}
@@ -259,7 +280,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			},  {
         		    	text:"Disable",
             			tooltip:"Disable all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
@@ -275,16 +296,16 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
 								
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       										
 																	
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -296,7 +317,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -304,7 +326,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'",
                							method: "Disable" + ids           							             							
             								}
@@ -314,7 +337,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			},"-",{
         		    	text:"Enable Admin",
             			tooltip:"Enable Admin to all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users_admin.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users_admin.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
@@ -330,16 +353,16 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
             					
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       										
 																	
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -351,7 +374,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -359,7 +383,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'",
                							method: "Admin" + ids           							             							
             								}
@@ -369,7 +394,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			},{
         		    	text:"Disable Admin",
             			tooltip:"Disable Admin to all selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
@@ -385,16 +410,16 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
             					
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       										
 																	
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -406,7 +431,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -414,7 +440,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'",
                							method: "NoAdmin" + ids           							             							
             								}
@@ -424,7 +451,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			},"-",{
             			text:"Delete",
             			tooltip:"Delete the selected users",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
             			handler: 		function (){
             					var grid = Ext.getCmp("button-grid");
             					if(grid.getSelectionModel().hasSelection()){
@@ -443,16 +470,16 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             					
             					var viewpanel = Ext.getCmp("nxcaretakerAction");
 								viewpanel.removeAll();
-								viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+								viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 								viewpanel.doLayout();
             					
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       										
 																		
         						Ext.Ajax.request({
-           							url: tx.caretaker.back_path + "ajax.php",
+           							url: "'.$back_path.'" + "ajax.php",
            							success : function (response, opts){											
       									           								
         								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -464,7 +491,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'" ,
                							actionid:      "'.$actionId.'"        							               							             							
             								}
@@ -472,7 +500,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
     									}     , 
            							params: { 
                							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   tx.caretaker.node_info.id,
+               							back_path : "'.$back_path.'",
+               							node:   "'.$node_id.'",
                							service:   "'.$service.'",
                							method: "Delete" + ids           							             							
             								}
@@ -483,8 +512,11 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
         			},{
             			text:"Add User",
             			tooltip:"Add new user",
-            			icon    : 	tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'",
+            			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'",
             			handler: 		function (){
+
+            			Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/md5.js"});
+            			
             					var grid = Ext.getCmp("button-grid");
             					
             						Ext.apply(Ext.form.VTypes, {									    
@@ -526,13 +558,13 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 										                allowBlank:false
 										            },{
 												        fieldLabel: "Password",
-												        inputType:"password",
+												        inputType:"password",												       
 												        name: "pass",
 												        id: passId,
 												        allowBlank:false
 												    },{
 												        fieldLabel: "Confirm Password",
-												        name: "pass-cfrm",
+												        name: "pass-cfrm",												        
 												        id: pass2Id,
 												        inputType:"password",
 												        vtype: "password",
@@ -550,7 +582,27 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 										            }
 										        ],
 						
-						                buttons: [{
+						                buttons: [
+						                {
+						                    text: "generate password",
+						                    handler: function(){
+						                    
+						                    	var charSet = "";
+												charSet += "0123456789";
+												charSet += "abcdefghijklmnopqrstuvwxyz";
+												charSet += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+												charSet += "`~!@#$%^&*()-_=+[{]}\\|;:\",<.>/? ";
+											
+												var rc = "";
+												
+												for (var idx = 0; idx < 8; ++idx) {
+													rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+												}
+						                    
+						                    	Ext.MessageBox.alert("password:",rc);
+						                    }
+						                },
+						                {
 						                    text:"Submit",
 						                    handler: function(){
 						                    	var username = Ext.getCmp(userId);
@@ -558,22 +610,23 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 						                    	var password2 = Ext.getCmp(pass2Id);						                    	
 						                    	var name = Ext.getCmp(nameId);
 						                    	var email = Ext.getCmp(emailId);
-						                    							                    	
+						                    	
+						                    	         	
 						                    	if(username.isValid() && email.isValid() && password.isValid() && password2.isValid()) {
 						                    		win.hide();
 
 						                    		var viewpanel = Ext.getCmp("nxcaretakerAction");
 													viewpanel.removeAll()	;
-													viewpanel.add({	html : "<img src="+tx.caretaker.back_path+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+													viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 													viewpanel.doLayout();
 						                    		
 					        						Ext.Ajax.request({
-					           							url: tx.caretaker.back_path + "ajax.php",
+					           							url: "'.$back_path.'" + "ajax.php",
 					           							success : function (response, opts){											
 					      										
 																						
 					        						Ext.Ajax.request({
-					           							url: tx.caretaker.back_path + "ajax.php",
+					           							url: "'.$back_path.'" + "ajax.php",
 					           							success : function (response, opts){											
 					      									           								
 					        								var jsonData = Ext.util.JSON.decode(response.responseText);
@@ -585,7 +638,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 					    									}     , 
 					           							params: { 
 					               							ajaxID: "tx_nxcaretakerservices::doaction",
-					               							node:   tx.caretaker.node_info.id,
+					               							back_path : "'.$back_path.'",
+					               							node:   "'.$node_id.'",
 					               							service:   "'.$service.'" ,
 					               							actionid:      "'.$actionId.'"        							               							             							
 					            								}
@@ -593,9 +647,14 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 					    									}     , 
 					           							params: { 
 					               							ajaxID: "tx_nxcaretakerservices::doaction",
-					               							node:   tx.caretaker.node_info.id,
+					               							back_path : "'.$back_path.'",
+					               							node:   "'.$node_id.'",
 					               							service:   "'.$service.'",
-					               							method: "Add,"+ username.getRawValue() +","+password.getRawValue() +","+ name.getRawValue() +","+ email.getRawValue()           							             							
+					               							addusername:username.getRawValue(),
+					               							addpassword: MD5(password.getRawValue()),
+					               							addname: name.getRawValue() ,
+					               							addemail:email.getRawValue() ,
+					               							method: "Add"       							             							
 					            								}
 					        							});
 					        							
@@ -613,6 +672,156 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 						        
 						        win.show(this);
             					            					            					
+							}		            
+        			},"-",{
+            			text:"Reset Password",
+            			tooltip:"reset password of selected users",
+            			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
+            			handler: 		function (){
+            			
+            					Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/md5.js"});
+            			
+            					var grid = Ext.getCmp("button-grid");            					
+            					if(grid.getSelectionModel().hasSelection()){
+            					var selections = grid.getSelectionModel().getSelections();
+								var ids = "";
+								var count = selections.length;
+								var i = 0;
+            					while(i<count)
+            					{
+            						ids = ids + "," + selections[i].get("uid");
+            						i++;
+            					}
+            					
+            						Ext.apply(Ext.form.VTypes, {									    
+									    password : function(val, field) {
+									        if (field.initialPassField) {
+									            var pwd = Ext.getCmp(field.initialPassField);
+									            return (val == pwd.getValue());
+									        }
+									        return true;
+									    },
+									
+									    passwordText : "Passwords do not match"
+									});
+									
+            						var passId = Ext.id();
+            						var pass2Id = Ext.id();
+            						            						
+            					 	var win = new Ext.Window({						                
+						                layout:"fit",
+						                closeAction:"hide",						                
+						                width: 375,
+						                height:250,						                
+						                plain: true,
+						                modal: true,
+										title: "Fill in new password",
+						                items: new Ext.FormPanel({
+										        labelWidth: 100,											        								        
+										        frame:true,										        
+										        bodyStyle:"padding:5px 5px 0",										        
+										        defaults: {width: 230},
+										        defaultType: "textfield",										
+										        items: [{
+												        fieldLabel: "Password",
+												        inputType:"password",												       
+												        name: "pass",
+												        id: passId,
+												        allowBlank:false
+												    },{
+												        fieldLabel: "Confirm Password",
+												        name: "pass-cfrm",												        
+												        id: pass2Id,
+												        inputType:"password",
+												        vtype: "password",
+												        initialPassField: passId,
+												        allowBlank:false
+												    }
+										        ],
+						
+						                buttons: [
+						                {
+						                    text: "generate password",
+						                    handler: function(){
+						                    
+						                    	var charSet = "";
+												charSet += "0123456789";
+												charSet += "abcdefghijklmnopqrstuvwxyz";
+												charSet += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+												charSet += "`~!@#$%^&*()-_=+[{]}\\|;:\",<.>/? ";
+											
+												var rc = "";
+												
+												for (var idx = 0; idx < 8; ++idx) {
+													rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+												}
+						                    
+						                    	Ext.MessageBox.alert("password:",rc);
+						                    }
+						                },
+						                {
+						                    text:"Submit",
+						                    handler: function(){						                    	
+						                    	var password = Ext.getCmp(passId);
+						                    	var password2 = Ext.getCmp(pass2Id);						                    	
+						                    							                    	         	
+						                    	if( password.isValid() && password2.isValid()) {
+						                    		win.hide();
+
+						                    		var viewpanel = Ext.getCmp("nxcaretakerAction");
+													viewpanel.removeAll()	;
+													viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
+													viewpanel.doLayout();
+						                    		
+					        						Ext.Ajax.request({
+					           							url: "'.$back_path.'" + "ajax.php",
+					           							success : function (response, opts){											
+					      										
+																						
+					        						Ext.Ajax.request({
+					           							url: "'.$back_path.'" + "ajax.php",
+					           							success : function (response, opts){											
+					      									           								
+					        								var jsonData = Ext.util.JSON.decode(response.responseText);
+					        																							
+															viewpanel.removeAll();
+															viewpanel.add(jsonData);
+															viewpanel.doLayout(); 	
+																				       								       								
+					    									}     , 
+					           							params: { 
+					               							ajaxID: "tx_nxcaretakerservices::doaction",
+					               							back_path : "'.$back_path.'",
+					               							node:   "'.$node_id.'",
+					               							service:   "'.$service.'" ,
+					               							actionid:      "'.$actionId.'"        							               							             							
+					            								}
+					        							});           																       								       								
+					    									}     , 
+					           							params: { 
+					               							ajaxID: "tx_nxcaretakerservices::doaction",
+					               							back_path : "'.$back_path.'",
+					               							node:   "'.$node_id.'",
+					               							service:   "'.$service.'",					               							
+					               							password: MD5(password.getRawValue()),					               							
+					               							method: "reset" + ids      							             							
+					            								}
+					        							});
+					        							
+												}
+						                    }
+						                },{
+						                    text: "Close",
+						                    handler: function(){
+						                        win.hide();
+						                    }
+						                }]
+										        
+										    })
+						            });
+						        
+						        win.show(this);
+            					} 					            					
 							}		            
         			}
         			],

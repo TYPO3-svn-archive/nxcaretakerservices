@@ -10,19 +10,24 @@ class tx_nxcaretakerservices_Action {
 		
 		$result="";
 		$node_id = t3lib_div::_GP('node');
-		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id) ){
+		$action_id = t3lib_div::_GP('actionid');
+	
+		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id)  ){
+			 	
 			
 			$serviceText = t3lib_div::_GP('service');
-			$actionid = t3lib_div::_GP('actionid');
-			$service = t3lib_div::makeInstanceService('caretaker_test_service', $serviceText);
-			$service->setInstance( $node->getInstance() );
-		
+			if($serviceText){			
+				$service = t3lib_div::makeInstanceService('nxcaretakerservices_action_service', $serviceText);
+				$action = $this->getActionsByUid($action_id, $node->getInstance());
+				if($action)	$service->setConfiguration($action->getServiceConfiguration());
+				$service->setInstance( $node->getInstance() );
+			}
 			$method = t3lib_div::_GP('method');
 			if($method)
 			{
-				$result = $service->doAction($method);				
+				$result = $service->doAction($params, $ajaxObj);				
 			}
-			else $result = $service->getView($serviceText, $actionid);
+			else $result = $service->getView($params, $ajaxObj);//$serviceText, $actionid);
 		}
 	echo $result;
 	}
@@ -66,6 +71,7 @@ class tx_nxcaretakerservices_Action {
 public function ajaxGetActionButtons($params, &$ajaxObj){
 		
 		$node_id = t3lib_div::_GP('node');
+		$back_path = t3lib_div::_GP('back_path');
 	
 		$result = '[';
 		
@@ -83,9 +89,9 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 				{ 
 				text	: "' . $action->getTitle() . '",
 				icon    : "../res/icons/test.png",
-				handler :   function (){					
+				handler :   function (){								
 	        						Ext.Ajax.request({
-	           							url: tx.caretaker.back_path + "ajax.php",
+	           							url: "'.$back_path.'" + "ajax.php",
 	           							success : function (response, opts){											
 	      									if(response.responseText.substr(0,5)=="error") alert(response.responseText);
 	      									else{            								
@@ -99,9 +105,10 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 	    									}     , 
 	           							params: { 
 	               							ajaxID: "tx_nxcaretakerservices::doaction",
-	               							node:   tx.caretaker.node_info.id,
+	               							node:   "'.$node_id.'",
 	               							service:   "'.$action->getServiceType().'" ,
-	               							actionid:      "'.$action->getUid().'"        							               							             							
+	               							actionid:      "'.$action->getUid().'",
+	               							back_path : "'.$back_path.'"     							               							             							
 	            								}
 	        							});
 	    						}
@@ -116,7 +123,7 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 	public function ajaxGetNodeInfo($params, &$ajaxObj){
 			
 			$node_id = t3lib_div::_GP('node');
-			$action_id =  t3lib_div::_GP('action');
+			$action_id =  t3lib_div::_GP('actionid');
 			$node = tx_caretaker_Helper::id2node($node_id);
 			$action = $this->getActionsByUid($action_id, $node->getInstance());
 			if($node  && $action)

@@ -24,11 +24,11 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
 
-class tx_nxcaretakerservices_ActionTestActionService extends tx_caretakerinstance_RemoteTestServiceBase{
+class tx_nxcaretakerservices_UnsecureEncryptionKeyTestService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {		
 		
-		$operation = array('GetInstallTool', array());
+		$operation = array('UnsecureEncryptionKey', array());
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -39,31 +39,17 @@ class tx_nxcaretakerservices_ActionTestActionService extends tx_caretakerinstanc
 		$results = $commandResult->getOperationResults();
 		$operationResult = $results[0];		
  		
-		$message =  'testaction (GetInstallTool)';
+		$message = $operationResult->getValue();
 		
 		if (!$operationResult->isSuccessful()) {	
 			
 			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
 		}
-		
+
 		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
 
 		return $testResult;
 	}	
-	
-	
-	
-	
-	
-	public function getValueDescription() {
-		return 'testaction';
-	}
-
-
-	
-	public function getView($service) {
-		return '[{text:"test"},{text:"test2"}]';
-	}
 }
 
 ?>
