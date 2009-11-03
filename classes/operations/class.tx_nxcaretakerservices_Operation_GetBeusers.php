@@ -68,6 +68,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			return new tx_caretakerinstance_OperationResult(FALSE, 'Field [' . $field . '] of table [' . $table . '] not found in the TCA');
 		}
 		
+		require_once (PATH_t3lib."class.t3lib_userauthgroup.php");
 		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
 		$GLOBALS['BE_USER']->user['admin'] = true;
 		
