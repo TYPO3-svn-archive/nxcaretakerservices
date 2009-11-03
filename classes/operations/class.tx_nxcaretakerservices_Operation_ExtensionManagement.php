@@ -25,6 +25,8 @@
 //define('TYPO3_MOD_PATH', '../typo3conf/');
 $BACK_PATH='../../../../../typo3/';
 
+require_once(t3lib_extMgm::extPath('lang', 'lang.php'));
+
 $GLOBALS['LANG'] = t3lib_div::makeInstance('language');
 $GLOBALS['LANG']->init($BE_USER->uc['lang']);
 
