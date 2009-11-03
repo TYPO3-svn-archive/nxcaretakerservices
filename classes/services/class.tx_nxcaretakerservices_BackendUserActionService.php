@@ -160,8 +160,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
             		reader: new Ext.data.ArrayReader({}, [
        					{name: "uid", type: "int"},	
             			{name: "username"},
-       					{name: "admin", type: "int"},
-       					{name: "disable", type: "int"},       					
+       					{name: "admin"},
+       					{name: "disable"},       					
        					{name: "llogin"},
        					{name: "email"},
        					{name: "realName"}
@@ -591,15 +591,29 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 												charSet += "0123456789";
 												charSet += "abcdefghijklmnopqrstuvwxyz";
 												charSet += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-												charSet += "`~!@#$%^&*()-_=+[{]}\\|;:\",<.>/? ";
-											
-												var rc = "";
+												charSet += "\`\~\!\@\#\$\%\^\&\*\(\)\-\_\=\+\[\{\]\}\\\|\'\;\:\"\,\.\/\?";
 												
-												for (var idx = 0; idx < 8; ++idx) {
-													rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+												var passwordList = "<table cellspacing=\"10\">";												
+												for (var rowi = 0; rowi < 10; ++rowi) {
+													passwordList = passwordList +"<tr>";
+													for (var passwords = 0; passwords < 8; ++passwords) {
+														var rc = "";
+														for (var idx = 0; idx < 8; ++idx) {
+															rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+														}
+														passwordList = passwordList +"<td>"+ rc + "</td>";													
+													}	
+													passwordList = passwordList +"</tr>";										
 												}
-						                    
-						                    	Ext.MessageBox.alert("password:",rc);
+						                   		passwordList = passwordList + "</table>";
+						                   		
+												  Ext.MessageBox.show({
+											           title: "Passwords",
+											           msg: passwordList,											          
+											           										         
+											           buttons: Ext.MessageBox.OK											           
+											       });
+												
 						                    }
 						                },
 						                {
@@ -712,7 +726,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 						                layout:"fit",
 						                closeAction:"hide",						                
 						                width: 375,
-						                height:250,						                
+						                height:150,						                
 						                plain: true,
 						                modal: true,
 										title: "Fill in new password",
@@ -744,19 +758,33 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 						                    text: "generate password",
 						                    handler: function(){
 						                    
-						                    	var charSet = "";
+						                       	var charSet = "";
 												charSet += "0123456789";
 												charSet += "abcdefghijklmnopqrstuvwxyz";
 												charSet += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-												charSet += "`~!@#$%^&*()-_=+[{]}\\|;:\",<.>/? ";
-											
-												var rc = "";
+												charSet += "\`\~\!\@\#\$\%\^\&\*\(\)\-\_\=\+\[\{\]\}\\\|\'\;\:\"\,\.\/\?";
 												
-												for (var idx = 0; idx < 8; ++idx) {
-													rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+												var passwordList = "<table cellspacing=\"10\">";												
+												for (var rowi = 0; rowi < 10; ++rowi) {
+													passwordList = passwordList +"<tr>";
+													for (var passwords = 0; passwords < 8; ++passwords) {
+														var rc = "";
+														for (var idx = 0; idx < 8; ++idx) {
+															rc = rc + charSet.charAt(Math.floor(Math.random() * charSet.length ));
+														}
+														passwordList = passwordList +"<td>"+ rc + "</td>";													
+													}	
+													passwordList = passwordList +"</tr>";										
 												}
-						                    
-						                    	Ext.MessageBox.alert("password:",rc);
+						                   		passwordList = passwordList + "</table>";
+						                   		
+												  Ext.MessageBox.show({
+											           title: "Passwords",
+											           msg: passwordList,											          
+											           										         
+											           buttons: Ext.MessageBox.OK											           
+											       });
+												
 						                    }
 						                },
 						                {
@@ -838,7 +866,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 	}
 		
 	public function getRows($row) {
-		return  '["'.$row['uid'].'","'.$row['username'].'","'.$row['admin'].'","'.$row['disable'].'","'.$row['llogin'].'","'.$row['email'].'","'.$row['realName'].'"]';
+		return  '["'.$row['uid'].'","'.$row['username'].'","'.($row['admin']? 'yes':'no').'","'.($row['disable']? 'yes':'no').'","'.$row['llogin'].'","'.$row['email'].'","'.$row['realName'].'"]';
 	}
 
 

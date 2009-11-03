@@ -52,6 +52,10 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 		$method = t3lib_div::_GP('method');		
 		$Result="";
 		
+		if(substr($method, 0, 12) == 'getClientExt') 
+		{			
+			$Result = $this->getClientExtensions($params, $ajaxObj);
+		}
 		if(substr($method, 0, 7) == 'svninfo') 
 		{			
 			$Result = $this->Action('svninfo',substr($method, 8));
@@ -95,16 +99,10 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 		return $Result;
 	}
 		
-	public function getView($params, &$ajaxObj) {
+	public function getClientExtensions($params, &$ajaxObj){
 		
-		$node_id = t3lib_div::_GP('node');
-		$back_path = t3lib_div::_GP('back_path');
-		$service = t3lib_div::_GP('service');
-		$actionId = t3lib_div::_GP('actionid');
 		
-		$location_list = array('system','global','local');
-		
-		$operation = array('GetExtensionList', array('locations' => $location_list));
+		$operation = array('ExtensionManagement', array('action' => 'getExtensions'));		
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -121,40 +119,102 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 
 		$extensionList = $operationResult->getValue();
 
-		$data ="[";
+		$data = array();
 				
 		foreach($extensionList as $extension){
-			if($data != '[') $data = $data . ',';
-			$data = $data . $this->getRows($extension);
+			
+			$data[] = $this->getRows($extension);
 		}
-		$data = $data . ']';
+		
+		
+		$retval = array('exts' => $data);
+		$ajaxObj->setContent($retval);
+        $ajaxObj->setContentFormat('jsonbody');
+	}
+	
+	public function getView($params, &$ajaxObj) {
+		
+		$node_id = t3lib_div::_GP('node');
+		$back_path = t3lib_div::_GP('back_path');
+		$service = t3lib_div::_GP('service');
+		$actionId = t3lib_div::_GP('actionid');
+		
+		
 		
 		$grid = '
 	
 		   new Ext.grid.GridPanel({
         		id:"button-grid",
+        		height:760,
+        		onResize: function() {
+        			var viewport = Ext.getCmp("viewport");
+        			viewport.doLayout();
+        			var grid = Ext.getCmp("button-grid");
+        			grid.store.load();
+        		},        		        		
+				forceFit:true,        		
+        		title:"Extension management",
         		loadMask: true,
-        		store: new Ext.data.Store({
-            		reader: new Ext.data.ArrayReader({}, [
-       					{name: "extKey"},	
-            			{name: "version"},
-       					{name: "installed"},
-       					{name: "secure"},       					
-       					{name: "scope"}       					
-    					]),
-            		data: 
-            			'.$data.'
+        		store: new  Ext.data.GroupingStore({
+            		reader: new Ext.data.JsonReader({
+									        idProperty: "extKey, version",
+									       	fields: ["title", "extKey", "version", "scope","secure","installed","category", "state","svn"],
+											// additional configuration for remote
+									       	root: "exts",									      
+									        remoteGroup:true									        
+									    }),
+    					sortInfo: {field: "extKey", direction: "ASC"},
+    					groupField: "scope",
+            		 proxy: new Ext.data.HttpProxy({url: "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::doaction&node=" + "'.$node_id.'" + "&actionid='.$actionId.'&service='.$service.'&method=getClientExt"}),
+									           
             		
         			}),
         		cm: new Ext.grid.ColumnModel([        			            			
+        			{header: "Name", width: 7, sortable: true, dataIndex: "title"},
     				{header: "Extensionkey", width: 7, sortable: true, dataIndex: "extKey"},
             		{header: "Version", width: 3, sortable: true, dataIndex: "version"},
-            		{header: "is installed", width: 3, sortable: true, dataIndex: "installed"},
+            		{header: "is installed", width: 2, sortable: true, dataIndex: "installed"},
             		{header: "is secure", width: 3, sortable: true, dataIndex: "secure"},
-            		{header: "Scope", width: 3, sortable: true, dataIndex: "scope"}
+            		{header: "Category", width: 3, sortable: true, dataIndex: "category"},
+            		{header: "Stable", width: 3, sortable: false, dataIndex: "state"},
+            		{header: "Scope", width: 2, sortable: true, dataIndex: "scope"},
+            		{header: "is SVN", width: 2, sortable: true, dataIndex: "svn"}
         			]),
-        		sm: new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
-        		viewConfig: { forceFit:true },
+        		sm: new Ext.grid.CheckboxSelectionModel({
+        				singleSelect:true,
+        				listeners: {			           
+			            selectionchange: function(sm) {
+			           //Ext.MessageBox.alert("dfghdfh", sm.selections.items[0].data.svn);   
+			           var SVNInfo = Ext.getCmp("SVNInfo");
+			           var SVNUpdate = Ext.getCmp("SVNUpdate");
+			           var Install = Ext.getCmp("Install");
+			           var Uninstall = Ext.getCmp("Uninstall");
+			           var Delete = Ext.getCmp("Delete");
+			           
+			           if(sm.selections.items.length > 0 && sm.selections.items[0].data.svn == "yes"){
+			            	SVNInfo.enable();
+			            	SVNUpdate.enable();
+			           }
+			           else {
+			           		SVNInfo.disable();
+			           		SVNUpdate.disable();
+			           }
+			           if(sm.selections.items.length > 0 && sm.selections.items[0].data.installed == "yes" && sm.selections.items[0].data.scope == "local"){
+			            	Install.disable();
+			            	Uninstall.enable();
+			            	Delete.disable();
+			           }
+			           else {
+			           		Install.enable();
+			           		Uninstall.disable();
+			           		Delete.enable();
+			           }
+			           
+			            }
+			        }
+			        				
+				}),
+        		
         		columnLines: true,
         		
         		buttons: [
@@ -195,6 +255,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
         		
 		        tbar:[{
         		    	text:"SVN Info",
+        		    	id:"SVNInfo",
+        		    	disabled:true,
             			tooltip:"Gets SVN Info, if exists",
             			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'",
             			handler: 		function (){
@@ -221,6 +283,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 							}
         			},{
         		    	text:"SVN Update",
+        		    	id:"SVNUpdate",
+        		    	disabled:true,
             			tooltip:"Execute a SVN update for the selected extension",
             			icon    : 	"../res/icons/arrow_refresh_small.png"   ,
             			handler: 		function (){
@@ -374,6 +438,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 						}
         			,"-",{
         		    	text:"Install",
+        		    	id:"Install",
+        		    	disabled:true,
             			tooltip:"Install the selected extension",
 	            		icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'",
             			handler: 		function (){
@@ -489,6 +555,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 							}
         			},{
         		    	text:"Uninstall",
+        		    	id:"Uninstall",
+        		    	disabled:true,
             			tooltip:"Uninstall the selected extension",
             			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'",
             			handler: 		function (){
@@ -541,6 +609,8 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 							}
         			},"-",{
             			text:"Delete",
+            			id:"Delete",
+        		    	disabled:true,
             			tooltip:"Delete the selected extension",
             			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
             			handler: 		function (){
@@ -604,24 +674,28 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
             			tooltip:"Fetch extension from TER",
             			icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'",
             			handler: 		function (){
-            					
-        					//	Ext.Ajax.request({
-           					//		url: "'.$back_path.'" + "ajax.php",
-           					//		success : function (response, opts){											
+            						
+									 var reader = new Ext.data.JsonReader({
+									        idProperty: "extkey, version",
+									       	fields: ["title", "extkey", "version", "authorname","reviewstate","description", "state"],
+											// additional configuration for remote
+									       	root: "exts",
+									       totalProperty: "totalCount",
+									        remoteGroup:true
+									        
+									    });
+									            			
 
-           							  // create the Data Store
-								    var store = new Ext.data.JsonStore({
-								    	storeId : "jstore",
-								        autodestroy : true,
-								    	root: "exts",
-								        totalProperty: "totalCount",
-								        idProperty: "extkey, version",
-								        								
-								        fields: ["title", "extkey", "version", "authorname","reviewstate","description"],
+									
+									   var store =   new Ext.data.GroupingStore({
+									   			storeId : "jstore",         
+									   			reader: reader,												
+									            proxy: new Ext.data.HttpProxy({url: "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::doaction&node=" + "'.$node_id.'" + "&actionid='.$actionId.'&service='.$service.'&method=TER"}),
+									            
+									            sortInfo: {field: "extkey", direction: "ASC"},									            	
+									            groupField: "extkey"
+									        });
 
-								        proxy: new Ext.data.HttpProxy({url: "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::doaction&node=" + "'.$node_id.'" + "&actionid='.$actionId.'&service='.$service.'&method=TER"})
-								    });
-								    	
 								    var grid = new Ext.grid.GridPanel({								        
 								        height:600,
 								        forceFit:true,
@@ -654,12 +728,18 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 								            header: "Review state",
 								            dataIndex: "reviewstate",
 								            width: 4,								            
-								            sortable: false
+								            sortable: true
+								        },{								            
+								            header: "Stable",
+								            dataIndex: "state",
+								            width: 4,								            
+								            sortable: true
 								        }],
-										sm: new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
-								        // customize view config
-								        viewConfig: {
+								       
+								        view: new Ext.grid.GroupingView({
 								            forceFit:true,
+								            startCollapsed 	: 	true,
+								            hideGroupedColumn: true,
 								            enableRowBody 	:	true,
 								            showPreview 	:	false,
 								            getRowClass 	: 	function(record, rowIndex, p, store){
@@ -668,10 +748,25 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 								                }
 								                
 								            }
-								        },
+								        }),
+								        
+								        
+										sm: new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
+								        // customize view config
+//								        viewConfig: {
+//								            forceFit:true,
+//								            enableRowBody 	:	true,
+//								            showPreview 	:	false,
+//								            getRowClass 	: 	function(record, rowIndex, p, store){
+//								                if(this.showPreview){
+//								                    p.body = "<p><Div style=\"padding:10px 5px 5px 15px;\">"+record.data.description+"</Div></p>";								                    
+//								                }
+//								                
+//								            }
+//								        },
 								       
 								        bbar: new Ext.PagingToolbar({
-								            pageSize: 50,
+								            pageSize: 100,
 								            store: store,
 								            displayInfo: true,
 								            displayMsg: "Displaying extensions {0} - {1} of {2}",
@@ -694,34 +789,58 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 								    
 								    
 								    // render it
-								    var win = new Ext.Window({						                
-						                layout:"fit",
+								    var win = new Ext.Window({
+								    	layout:"fit",
 						                closeAction:"hide",						                
 						                width: 775,
 						                height:750,						                
 						                plain: true,
-						                modal: true,
-										//title: "Fill in user data",
-						                items: new Ext.FormPanel({
-										        											        								        
-										        frame:true,										        
-										        //bodyStyle:"padding:5px 5px 0",										        
-										        										
-										        items: [grid],
+						                modal: true,										
+						                items: new Ext.FormPanel({					       												       											        								        
+										        frame:true,				
+										        itemId: "filterIdpp",	
+										        items: [grid,
+										        {		
+										        			style:{marginTop : "15px", marginLeft:"15px"},
+											                columnWidth:.5,
+											                itemId: "filterIdp",	
+											                labelWidth: 100,
+											                defaultType: "textfield",	
+											                layout: "form",
+											                items: [{
+										        
+														        	width		:	230,
+														        	fieldLabel	: 	"Filter",
+ 																	itemId: "filterId",														        	
+														            name		: 	"filter",
+																	anchor		:	"95%"
+										      						}]	
+            										   
+										        }],
 						
-						                buttons: [{
+						                buttons: [
+						                {
+						                    text: "Filter",
+						                    handler: function(){
+						                    	var filter = win.getComponent("filterIdpp").getComponent("filterIdp").getComponent("filterId");
+						                    	var filterstr = filter.getRawValue();
+						                    	store.baseParams.filter = filterstr;
+						                    	store.load({params:{start:0, limit:100}});    
+						                    }
+						                },{
 						                    text: "Add selected extension",
 						                    handler: function(){
 						                       
 						                        
 				            					if(grid.getSelectionModel().hasSelection()){				            					
+				            					
 				            					var selection = grid.getSelectionModel().getSelected().get("extkey") +","+ grid.getSelectionModel().getSelected().get("version");
 						                        
 						                        var viewpanel = Ext.getCmp("nxcaretakerAction");
 													viewpanel.removeAll()	;
 													viewpanel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
 													viewpanel.doLayout();
-						                    	win.hide();	
+						                    	win.hide();
 					        						Ext.Ajax.request({
 					           							url: "'.$back_path.'" + "ajax.php",
 					           							success : function (response, opts){											
@@ -756,6 +875,7 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 					               							method: "fetch,"+selection           							             							
 					            								}
 					        							});
+													
 					        					}
 						                    }
 						                },{
@@ -768,8 +888,9 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 										    })
 						            });
 						        
+						            
 						        win.show(this);
-								store.load({params:{start:0, limit:50}});
+								store.load({params:{start:0, limit:100}});
 							   
            						          							
     							
@@ -777,11 +898,15 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 							}
         			
         			],
+        			        			
+					view: new Ext.grid.GroupingView({
+				            forceFit:true,
+				            startCollapsed 	: 	true,
+				            hideGroupedColumn: true     
+				            
+			        })
+//        		viewConfig: { forceFit:true }
 
-        		
-        		autoHeight      : true   ,
-        		frame:true,
-        		title:"Extension management"
     		})
 		
 		';
@@ -791,30 +916,38 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 		
 	public function getRows($row) {
 		$ter_info = $this->getExtensionTerInfos($row['ext_key'], $row['version']);
+		$retval = array();
+		$retval['extKey'] = $row['ext_key'];
+		$retval['version'] = $row['version'];
 		if ($ter_info) {
-			if ($ter_info['reviewstate'] > -1) {
-				$secure = 'reviewed';
+			if ($ter_info['reviewstate'] > -1) {				
+				$retval['secure'] = 'reviewed';
 			}else{
-				$secure = 'unsecure';
+				$retval['secure'] = 'unsecure';
 			}
-		}else{
-			$secure = 'unknown';
+		}else{			
+			$retval['secure'] = 'unknown';
 		}
 		$scope = '';
 		if($row['scope']['system']){
-			$scope = 'system'; 
+			$retval['scope']  = 'system'; 
 		}
 		if($row['scope']['global']){
-			$scope = 'global'; 
+			$retval['scope']  = 'global'; 
 		}
 		if($row['scope']['local']){
-			$scope = 'local'; 
+			$retval['scope']  = 'local'; 
 		}
-		return  '["'.$row['ext_key'].'","'.$row['version'].'","'.($row['installed'] ? 'yes':'no').'","'.$secure.'","'.$scope.'"]';
+		$retval['installed'] = ($row['installed'] ? 'yes':'no');
+		$retval['category'] = $row['category'];
+		$retval['svn'] = $row['svn'] ? 'yes' : 'no';
+		$retval['state'] = $ter_info['state'];
+		$retval['title'] = $row['title'];
+		return $retval;
 	}
 
 	public function getExtensionTerInfos( $ext_key, $ext_version ){
-		$ext_infos = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('extkey, version, reviewstate','cache_extensions','extkey = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_key,'cache_extensions' ).' AND version = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_version,'cache_extensions'), '', '' , 1 );
+		$ext_infos = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('title, extkey, version, reviewstate, category, state','cache_extensions','extkey = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_key,'cache_extensions' ).' AND version = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($ext_version,'cache_extensions'), '', '' , 1 );
 		if (count($ext_infos)==1){
 			return $ext_infos[0];
 		} else {
@@ -823,10 +956,17 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 	}
 
 	public function getExtensionTer($params, &$ajaxObj){
-		 $start     = (int)t3lib_div::_GP('start');
-         $limit     = (int)t3lib_div::_GP('limit');
-				
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('extkey, version, title, description, reviewstate, authorname','cache_extensions','1=1'); 
+		$start     = (int)t3lib_div::_GP('start');
+        $limit     = (int)t3lib_div::_GP('limit');
+        $filter     = t3lib_div::_GP('filter');
+		
+        if($filter) $whereClause = 'extkey LIKE "'.$filter.'%" ';
+		else $whereClause = '1=1';
+		
+		$groupBy='';
+		$orderBy='extkey ASC, version DESC';
+		
+		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('extkey, version, description, reviewstate, state, title, authorname','cache_extensions',$whereClause, $groupBy, $orderBy); 
 		if ($result){
 			$rows = array();
 			$totalCount = 0;				
@@ -834,7 +974,30 @@ class tx_nxcaretakerservices_ExtensionManagerActionService extends tx_caretakeri
 				{
 					if ($record !== FALSE) {				
 						if($totalCount>= $start && $totalCount<$start+$limit){
-							$rows[] = $record;
+							
+//							$versionResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery('version, description, reviewstate, state','cache_extensions','extkey = "'.$record['extkey'].'"','','version'); 
+//							if ($versionResult){
+//								while($versionRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($versionResult))
+//								{
+//									if ($versionRecord !== FALSE) {
+//										if($record['versions']) $record['versions'] .='; ';
+//										$record['versions'] .= $versionRecord['version'];
+//										$record['version'] = $versionRecord['version'];
+//										$record['description'] = $versionRecord['description'];
+//										if($versionRecord['reviewstate'] == -1)	{
+//											$record['reviewstate'] = 'unsecure';
+//											$record['versions'] .= '(unsecure)';
+//										}
+//										if($versionRecord['reviewstate'] == 0)	$record['reviewstate'] = 'unknown';
+//										if($versionRecord['reviewstate'] == 1)	{
+//											$record['reviewstate'] = 'reviewed';
+//											$record['versions'] .= '(reviewed)';
+//										}
+//										$record['stable'] = $versionRecord['state'];		
+//									}
+//								}
+//							}
+							$rows[] = $record;												
 						}
 						$totalCount++;
 					}

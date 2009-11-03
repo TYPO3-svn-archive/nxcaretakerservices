@@ -28,23 +28,38 @@ class tx_nxcaretakerservices_ActionTestActionService extends tx_caretakerinstanc
 	
 	public function runTest() {		
 		
-		$operation = array('GetInstallTool', array());
-		$operations = array($operation);
-
-		$commandResult = $this->executeRemoteOperations($operations);
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			return $this->getFailedCommandResultTestResult($commandResult);
-		}
-
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];		
- 		
-		$message =  'testaction (GetInstallTool)';
+//		$operation = array('GetInstallTool', array());
+//		$operations = array($operation);
+//
+//		$commandResult = $this->executeRemoteOperations($operations);
+//		if (!$this->isCommandResultSuccessful($commandResult)) {
+//			return $this->getFailedCommandResultTestResult($commandResult);
+//		}
+//
+//		$results = $commandResult->getOperationResults();
+//		$operationResult = $results[0];		
+// 		
+//		$message =  'testaction (GetInstallTool)';
+//		
+//		if (!$operationResult->isSuccessful()) {	
+//			
+//			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
+//		}
 		
-		if (!$operationResult->isSuccessful()) {	
-			
-			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
-		}
+		
+		global $TYPO3_CONF_VARS;
+
+		//$strippedExtensionList = $this->stripNonFrontendExtensions($newExtList);
+
+		// Instance of install tool
+		$instObj = t3lib_div::makeInstanceClassName('t3lib_install');
+		$instObj->allowUpdateLocalConf =1;
+		$instObj->updateIdentity = 'nxcaretakerservices';
+
+		// Get lines from localconf file
+		$lines = $instObj->writeToLocalconf_control();
+		$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'Test\']', 'Testtext');		
+		$instObj->writeToLocalconf_control($lines);
 		
 		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
 

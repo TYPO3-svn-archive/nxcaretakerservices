@@ -38,9 +38,9 @@ if($confArray['enableServerExt'])
 	if (t3lib_extMgm::isLoaded('caretaker') ){
 		include_once(t3lib_extMgm::extPath('caretaker') . 'classes/class.tx_caretaker_ServiceHelper.php');
 			
-		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Check for an open Install Tool', 'Look for ENABLE_INSTALL_TOOL');
-		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UnsecureEncryptionKey',  'TYPO3 -> Check for an unsecure encryption key', 'compare it with a blacklist');
-		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'test password', '');
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Check open Install Tool', 'Look for ENABLE_INSTALL_TOOL');
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UnsecureEncryptionKey',  'TYPO3 -> Check unsecure encryption key', 'compare it with a blacklist');
+		tx_caretaker_ServiceHelper::registerCaretakerService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'test localconfediting', '');
 	}
 
 	t3lib_div::loadTCA('tx_caretaker_instance');
@@ -97,10 +97,11 @@ if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
 	include_once(t3lib_extMgm::extPath('nxcaretakerservices') . 'classes/class.tx_nxcaretakerservices_ActionServiceHelper.php');
 
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ActionTest',  'TYPO3 -> test Action', 'test');
-	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Install Tool Action', 'create and delete the install tool');
-	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_BackendUser',  'TYPO3 -> User management', 'enable an disable backend users');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_InstallTool',  'TYPO3 -> Install Tool Action', 'enable and disable the install tool.');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_BackendUser',  'TYPO3 -> User management', 'enable an disable backend users.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UpdateNxcaretakerservices',  'TYPO3 -> Update nxcaretakerservices', 'If the nxcaretakerservices extension of the client is older than the servers one, this will update it.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ExtensionManager',  'TYPO3 -> Extension Manager', 'Manage clients extensions.');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_DeprecationLog',  'TYPO3 -> Deprecation Log Action', 'enable and disable the deprecation log.');
 	
 }
 

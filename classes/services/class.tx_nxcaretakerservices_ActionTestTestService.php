@@ -46,9 +46,20 @@ class tx_nxcaretakerservices_ActionTestTestService extends tx_caretakerinstance_
 //			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
 //		}
 		
-		$table = 'be_users';//$parameter['table'];
-		$field = 'username';//$parameter['field'];
-		$test = 'abc';
+		global $TYPO3_CONF_VARS;
+
+		//$strippedExtensionList = $this->stripNonFrontendExtensions($newExtList);
+		require_once(PATH_t3lib.'class.t3lib_install.php');
+		// Instance of install tool
+		$instObj = new t3lib_install;
+		$instObj->allowUpdateLocalConf =1;
+		$instObj->updateIdentity = 'nxcaretakerservices';
+
+		// Get lines from localconf file
+		$lines = $instObj->writeToLocalconf_control();
+		$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'TestLocalCofEditing\']', 'Testtext');		
+		$instObj->writeToLocalconf_control($lines);
+		
 	//	$test = $this->evalPassword($test);
 		
 //		$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, array('username'=>'test', 'password'=>$test,'realName'=>'test','email'=>'test@netlogix.de') );
@@ -59,23 +70,23 @@ class tx_nxcaretakerservices_ActionTestTestService extends tx_caretakerinstance_
 //			$result = $result . $dsConf['TCEforms']['config']['eval'] . ", \n";
 //		}
 
-		$data = array('be_users' => array('NEWuser'=>array('username'=>'test', 'password'=>$test,'realName'=>'test','email'=>'test@netlogix.de')));
-		
-		$this->includeTCA();
-		
-		$tce = t3lib_div::makeInstance('t3lib_TCEmain');
-		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
-		$GLOBALS['BE_USER']->user['uid'] = 9999;
-		$GLOBALS['BE_USER']->user['username'] = 'tempAdmin';
-		$GLOBALS['BE_USER']->user['admin'] = true;
-   	 	$tce->stripslashes_values = 0;
-
-    	$tce->start($data,array());
-		$tce->BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');
-		$tce->BE_USER->user['admin'] = 1;
-    	$tce->process_datamap();
-		
-		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0,'');
+//		$data = array('be_users' => array('NEWuser'=>array('username'=>'test', 'password'=>$test,'realName'=>'test','email'=>'test@netlogix.de')));
+//		
+//		$this->includeTCA();
+//		
+//		$tce = t3lib_div::makeInstance('t3lib_TCEmain');
+//		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
+//		$GLOBALS['BE_USER']->user['uid'] = 9999;
+//		$GLOBALS['BE_USER']->user['username'] = 'tempAdmin';
+//		$GLOBALS['BE_USER']->user['admin'] = true;
+//   	 	$tce->stripslashes_values = 0;
+//
+//    	$tce->start($data,array());
+//		$tce->BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');
+//		$tce->BE_USER->user['admin'] = 1;
+//    	$tce->process_datamap();
+//		
+//		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0,'');
 
 		return $testResult;
 	}	

@@ -82,9 +82,30 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 			case 'databaseUpdate' :
 				$retval = $this->updateDatabase($extkey);
 				break;
+			case 'getExtensions' :
+				$retval = $this->getExtensionList();
+				break;
 		}
 		
 		return $retval;
+		
+	}
+	
+	protected $scopes = array('system', 'global', 'local');
+	
+	protected function getExtensionList() {
+		$locations = array('system','global','local');		
+		if (is_array($locations) && count($locations) > 0 ) {
+			$extensionList = array();
+			foreach ($locations as $scope) {
+				if (in_array($scope, $this->scopes)) {
+					$extensionList = array_merge($extensionList, $this->getExtensionListForScope($scope));
+				}
+			}
+			return new tx_caretakerinstance_OperationResult(TRUE, $extensionList);
+		} else {
+			return new tx_caretakerinstance_OperationResult(FALSE, 'No extension locations given');
+		}
 		
 	}
 	
@@ -301,6 +322,55 @@ class tx_nxcaretakerservices_Operation_ExtensionManagement implements tx_caretak
 	    @rmdir($dir);
 	   
 	    return;
+	}
+	
+	protected function getPathForScope($scope) {
+		$path = '';
+		switch ($scope) {
+			case 'system':
+				$path = PATH_typo3 . 'sysext/';
+				break;
+			case 'global':
+				$path = PATH_typo3 . 'ext/';
+				break;
+			case 'local':
+			default:
+				$path = PATH_typo3conf . 'ext/';
+				break;
+		}
+		return $path;
+	}
+	
+	protected function getExtensionListForScope($scope) {
+		$path = $this->getPathForScope($scope);
+		$extensionInfo = array();
+		if (@is_dir($path))	{
+			$extensionFolders = t3lib_div::get_dirs($path);
+			if (is_array($extensionFolders)) {
+				foreach($extensionFolders as $extKey) {
+					if(@is_dir($path.$extKey.'/.svn')) $extensionInfo[$extKey]['svn'] = true;
+					$extensionInfo[$extKey]['ext_key'] = $extKey;					
+					$extensionInfo[$extKey]['installed'] = (boolean)t3lib_extMgm::isLoaded($extKey);
+
+					if (@is_file($path . $extKey . '/ext_emconf.php'))	{
+						$_EXTKEY = $extKey;
+						@include($path . $extKey . '/ext_emconf.php');
+						$extensionVersion = $EM_CONF[$extKey]['version'];
+						$extensionInfo[$extKey]['category'] = $EM_CONF[$extKey]['category']; 
+						$extensionInfo[$extKey]['title'] = $EM_CONF[$extKey]['title']; 
+					} else {
+						$extensionVersion = FALSE;
+					}
+
+					if ($extensionVersion) {
+						$extensionInfo[$extKey]['version'] = $extensionVersion;
+						$extensionInfo[$extKey]['scope'][$scope] = $extensionVersion;
+					}					
+				}
+			}
+		}
+		
+		return $extensionInfo;
 	}
 }
 ?>
