@@ -89,12 +89,22 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 				{ 
 				text	: "' . $action->getTitle() . '",
 				icon    : "../res/icons/test.png",
-				handler :   function (){								
+				handler :   function (){		
+
+//						Ext.getBody().createChild({
+//            					tag: "script", 
+//            					html : "var backpath = \"'.$back_path.'\"; var nodeid = \"'.$node_id.'\"; var service = \"'.$service.'\"; var action = \"'.$action->getUid().'\"; var img = \"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).'\";"
+//						});
+//						Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/ext_expander.js"});
+//            			Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/services/ExtensionManager.js"});
+//            			
+				
 	        						Ext.Ajax.request({
 	           							url: "'.$back_path.'" + "ajax.php",
 	           							success : function (response, opts){											
 	      									if(response.responseText.substr(0,5)=="error") alert(response.responseText);
-	      									else{            								
+	      									else{
+	      									
 		        								var jsonData = Ext.util.JSON.decode(response.responseText);
 		        								
 												var viewpanel = Ext.getCmp("nxcaretakerAction");
