@@ -83,7 +83,26 @@ class tx_nxcaretakerservices_Operation_InstallToolAction implements tx_caretaker
 			else{
 				return new tx_caretakerinstance_OperationResult(FALSE, $filename . ' file already is deleted!');
 			}
-		}			
+		}	
+
+		require_once(PATH_t3lib.'class.t3lib_install.php');
+				
+		if($action == 'reset')
+		{						
+			$password = $parameter['password'];
+			if($password) {					
+				$instObj = new t3lib_install;
+				$instObj->allowUpdateLocalConf =1;
+				$instObj->updateIdentity = 'nxcaretakerservices->InstallToolAction';				
+				
+				$lines = $instObj->writeToLocalconf_control();
+				$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'BE\'][\'installToolPassword\']', $password);		
+				$instObj->writeToLocalconf_control($lines);
+				
+				return new tx_caretakerinstance_OperationResult(TRUE, 'Password reset.');
+			}		
+			else return new tx_caretakerinstance_OperationResult(FALSE, 'no password.');
+		}
 	}
 }
 ?>

@@ -51,27 +51,9 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 		return $testResult;
 	}	
 	
-	public function delete() {
-		
-		$operation = array('InstallToolAction', array('action' => 'delete'));
-		$operations = array($operation);
+	public function action($action, $password='') {
 
-		$commandResult = $this->executeRemoteOperations($operations);
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			// error!
-		}
-
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];		
- 		
-		$message = $operationResult->getValue();
-		
-		return $message;
-	}
-	
-	public function create() {
-
-		$operation = array('InstallToolAction', array('action' => 'create'));
+		$operation = array('InstallToolAction', array('action' => $action, 'password' => $password));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -94,10 +76,14 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 		
 		switch ( $method ){
 				case "delete":
-					$Result=$this->delete();
+					$Result=$this->action('delete');
 				break;
 				case "create":
-					$Result=$this->create();
+					$Result=$this->action('create');
+				break;
+				case "reset":
+					$password = t3lib_div::_GP('password');
+					$Result=$this->action('reset', $password);
 				break;
 				default:
 					$Result = "none";
@@ -108,73 +94,7 @@ class tx_nxcaretakerservices_InstallToolActionService extends tx_caretakerinstan
 		
 	public function getView($params, &$ajaxObj) {
 		
-		$node_id = t3lib_div::_GP('node');
-		$back_path = t3lib_div::_GP('back_path');
-		$service = t3lib_div::_GP('service');
-		$actionId = t3lib_div::_GP('actionid');
 		
-		$message ='[{text:"disable",
-						icon    : 	"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'",
-						handler:
-							function (){
-
-								var node_info_panel = Ext.getCmp("node-added-action");								
-								node_info_panel.removeAll()	;
-								node_info_panel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
-								node_info_panel.doLayout();
-							
-        						Ext.Ajax.request({
-           							url: "'.$back_path.'" + "ajax.php",
-           							success : function (response, opts){											
-      									Ext.MessageBox.alert("Status", response.responseText);
-      									
-        								node_info_panel.load( "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node=" + "'.$node_id.'" + "&actionid='.$actionId.'");        																					       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   "'.$node_id.'",
-               							service:   "'.$service.'",
-               							method: "delete"               							             							
-            								}
-        							});
-    						}
-					},{text:"enable",
-						icon    : "../res/icons/test.png",
-						handler:
-							function (){
-
-								var node_info_panel = Ext.getCmp("node-added-action");								
-								node_info_panel.removeAll()	;
-								node_info_panel.add({	html : "<img src="+"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).' style=\"width:16px;height:16px;\" align=\"absmiddle\">" });				
-								node_info_panel.doLayout();
-							
-        						Ext.Ajax.request({
-           							url: "'.$back_path.'" + "ajax.php",
-           							success : function (response, opts){											
-      									Ext.MessageBox.alert("Status", response.responseText);
-           							    
-        								node_info_panel.load( "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node='.$node_id.'&actionid='.$actionId.'");        																											       								       								
-    									}     , 
-           							params: { 
-               							ajaxID: "tx_nxcaretakerservices::doaction",
-               							node:   "'.$node_id.'",
-               							service:   "'.$service.'",
-               							method: "create"               							             							
-            								}
-        							});
-    						}
-	}]';
-		
-		$jsonData = 'new Ext.Panel({										
-        									id              : "node-added-action",        									
-        									autoHeight      : true   ,
-											title 	:	"Install Tool:",																		
-											autoLoad 	: "'.$back_path.'" + "ajax.php?ajaxID=tx_nxcaretakerservices::actioninfo&node='.$node_id.'&actionid='.$actionId.'",
-        									bbar 			: [
-											 '.$message .'
-												]
-    									})';
-		return $jsonData;
 		
 		
 	}

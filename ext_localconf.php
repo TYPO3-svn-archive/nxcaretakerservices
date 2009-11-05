@@ -18,18 +18,14 @@ $TYPO3_CONF_VARS['BE']['AJAX']['tx_nxcaretakerservices::getActionButtons']    = 
 $TYPO3_CONF_VARS['EXTCONF']['caretaker']['additionalTabs']['actionTab'] = '{		
     	    			id:"nxcaretakerAction",
     	    			title:"Action",
-    	    			xtype    : "panel",
-    	    			//autoScroll: true,
-    	    			//width:450,
-    	    			//height:760,
+    	    			xtype    : "panel",    	    			
     	    			tbar: {	    	    				
     	    				id		:	"actionToolbar",	
     	    				layout 	: 	"toolbar",
     	    				back_path:back_path,    
     	    				node_id:node_id,	    				
     	    		            items :  []
-    	    			},
-    	    			//defaults:{autoHeight: true},
+    	    			},    	    			
     	    			items:[],
     	    			listeners: {activate:	function(tab){
     	    				Ext.Ajax.request({

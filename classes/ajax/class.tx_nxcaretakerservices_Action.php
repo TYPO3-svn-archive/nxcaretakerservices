@@ -87,41 +87,41 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 				if(	$result != '[') $result = $result . ',';
 				$result = $result . '
 				{ 
-				text	: "' . $action->getTitle() . '",
-				icon    : "../res/icons/test.png",
+				text	: 	"' . $action->getTitle() . '",
+				icon    : 	"../res/icons/test.png",
 				handler :   function (){		
-
-//						Ext.getBody().createChild({
-//            					tag: "script", 
-//            					html : "var backpath = \"'.$back_path.'\"; var nodeid = \"'.$node_id.'\"; var service = \"'.$service.'\"; var action = \"'.$action->getUid().'\"; var img = \"'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).'\";"
-//						});
-//						Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/ext_expander.js"});
-//            			Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/services/ExtensionManager.js"});
-//            			
 				
-	        						Ext.Ajax.request({
-	           							url: "'.$back_path.'" + "ajax.php",
-	           							success : function (response, opts){											
-	      									if(response.responseText.substr(0,5)=="error") alert(response.responseText);
-	      									else{
-	      									
-		        								var jsonData = Ext.util.JSON.decode(response.responseText);
-		        								
-												var viewpanel = Ext.getCmp("nxcaretakerAction");
-												viewpanel.removeAll();
-												viewpanel.add(jsonData);
-												viewpanel.doLayout(); 																	       								       								
-		    									}
-	    									}     , 
-	           							params: { 
-	               							ajaxID: "tx_nxcaretakerservices::doaction",
-	               							node:   "'.$node_id.'",
-	               							service:   "'.$action->getServiceType().'" ,
-	               							actionid:      "'.$action->getUid().'",
-	               							back_path : "'.$back_path.'"     							               							             							
-	            								}
-	        							});
-	    						}
+					//	Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/ext_expander.js"});
+            			var jsCode = Ext.getBody().createChild({tag: "script", src: "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/services/'.$action->getServiceType().'.js"});
+            			console.log(jsCode);
+            			
+            			
+//        				Ext.Ajax.request({
+//           					url		: 	"'.$back_path.'" + "ajax.php",
+//           					success : 	function (response, opts) {	
+//							
+		           					var nxparams = new Array();
+		           					nxparams["md5src"] = "' . $back_path . t3lib_extMgm::extRelPath('nxcaretakerservices') . 'classes/ajax/md5.js";
+		           					nxparams["ajaxLoadingImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'sysext/t3skin/extjs/images/grid/loading.gif', '', 1).'";
+		           					nxparams["garbageImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/garbage.gif', '', 1).'";
+		           					nxparams["unhideImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_unhide.gif', '', 1).'";
+		           					nxparams["hideImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/button_hide.gif', '', 1).'";
+		           					nxparams["adminImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users_admin.gif', '', 1).'";
+		           					nxparams["userImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users.gif', '', 1).'";
+		           					nxparams["addImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'";
+		           							           					
+		           					'.str_replace('_','.',$action->getServiceType()).'("'.$back_path.'", "'.$node_id.'", "'.$action->getServiceType().'", "'.$action->getUid().'", nxparams);
+           				
+//    							}, 
+//           					params	: 	{ 
+//	               					ajaxID		: 	"tx_nxcaretakerservices::doaction",
+//	               					node		:   "'.$node_id.'",
+//	               					service		:   "'.$action->getServiceType().'" ,
+//	               					actionid	:   "'.$action->getUid().'",
+//	               					back_path 	: 	"'.$back_path.'"     							               							             							
+//            					}
+//        				});
+    				}
 				}';					
 				}
 			}
