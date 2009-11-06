@@ -162,14 +162,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 	public function getView($params, &$ajaxObj) {
 		
 	}
-		
-	public function getRows($row) {
-		return  '["'.$row['uid'].'","'.$row['username'].'","'.($row['admin']? 'yes':'no').'","'.($row['disable']? 'yes':'no').'","'.$row['llogin'].'","'.$row['email'].'","'.str_replace('"','\\"',$row['realName']).'"]';
-	}
-
-
-
-
+	
 }
 
 
