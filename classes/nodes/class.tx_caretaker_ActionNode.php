@@ -41,7 +41,7 @@
 
 require_once (t3lib_extMgm::extPath('caretaker').'/classes/nodes/class.tx_caretaker_AbstractNode.php');
 require_once (t3lib_extMgm::extPath('caretaker').'/classes/results/class.tx_caretaker_TestResult.php');
-require_once (t3lib_extMgm::extPath('caretaker').'/classes/repositories/class.tx_caretaker_TestResultRepository.php');
+require_once (t3lib_extMgm::extPath('nxcaretakerservices').'/classes/nodes/class.tx_nxcaretakerservices_ActionResultRepository.php');
 require_once PATH_site.'typo3/sysext/lang/lang.php';
 
 class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
@@ -143,7 +143,7 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 	 */
 	public function updateTestResult($force_update = false){
 		
-		$test_result_repository = tx_caretaker_TestResultRepository::getInstance();
+		$test_result_repository = tx_nxcaretakerservices_ActionResultRepository::getInstance();
 		$instance = $this->getInstance();
 				
 		$test_service = t3lib_div::makeInstanceService('nxcaretakerservices_action_service',$this->test_service_type);
@@ -168,27 +168,40 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 		
 		if($test_service->isExecutable()) {
 			
-				// prepare
-			$test_id = $test_result_repository->prepareTest($instance, $this);
-			$result = $this->runTest($test_service);
-			$test_result_repository->saveTestResult($test_id, $result);
-			
-			$message = unserialize($result->getMsg());
-			
-			if($message) {
-				
-				$msg = $this->aggregateMessage($message);
-				
-			} else {
-			
-				$msg = $result->getMsg();
+				// try to execute test
+			try {
+				$result = $test_service->runTest();
+			} catch ( Exception $e ) {
+				$result = new tx_caretaker_TestResult( TX_CARETAKER_STATE_ERROR , 0, '{LLL:EXT:caretaker/locallang_fe.xml:service_exception}'.$e->getMessage  );
 			}
-					
-			if ($result->getState() > 0){
-				$this->sendNotification($result->getState(), $msg );
-			} 
 			
-			$this->log('update '.$result->getStateInfo().' '.$result->getValue().' '.$msg );
+				// retry if not ok and retrying is enabled
+			if ($result->getState() != 0 && $this->test_retry > 0){
+				$round = 0;
+				while ( $round < $this->test_retry && $result->getState() != 0 ){
+					try {
+						$result = $test_service->runTest();
+					} catch ( Exception $e ) {
+						$result = new tx_caretaker_TestResult( TX_CARETAKER_STATE_ERROR , 0, '{LLL:EXT:caretaker/locallang_fe.xml:service_exception}'.$e->getMessage  );
+					}
+					$round ++;
+				}
+				$result->addSubMessage( new tx_caretaker_ResultMessage( 'LLL:EXT:caretaker/locallang_fe.xml:retry_info' , array( 'number'=>$round )  ) );
+			}
+
+				// save to repository if the result differs from the last one
+			$resultRepository = tx_nxcaretakerservices_ActionResultRepository::getInstance();
+			$lastTestResult = $resultRepository->getLatestByNode($this);
+
+			if ($lastTestResult->isDifferent($result) ){
+				$resultRepository->saveTestResultForNode( $this, $result);
+			}
+			
+				// trigger notification
+			$this->notify( $result,$lastTestResult );
+
+				// trigger log
+			$this->log('update '.$result->getLocallizedStateInfo().' '.$result->getLocallizedInfotext().' '.$msg );
 			
 		} else {
 			
@@ -197,6 +210,38 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 		}
 		
 		return $result;
+		
+//		if($test_service->isExecutable()) {
+//			
+//				// prepare
+//			$test_id = $test_result_repository->prepareTest($instance, $this);
+//			$result = $this->runTest($test_service);
+//			$test_result_repository->saveTestResult($test_id, $result);
+//			
+//			$message = unserialize($result->getMsg());
+//			
+//			if($message) {
+//				
+//				$msg = $this->aggregateMessage($message);
+//				
+//			} else {
+//			
+//				$msg = $result->getMsg();
+//			}
+//					
+//			if ($result->getState() > 0){
+//				$this->sendNotification($result->getState(), $msg );
+//			} 
+//			
+//			$this->log('update '.$result->getStateInfo().' '.$result->getValue().' '.$msg );
+//			
+//		} else {
+//			
+//			$result = $test_result_repository->getLatestByInstanceAndTest($instance, $this);
+//			$this->log('Service is busy... skipping test.');
+//		}
+//		
+//		return $result;
 		
 	}
 	
@@ -297,6 +342,15 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 	}
 	
 	/**
+	 * Get the caretaker node id of this node
+	 * return string
+	 */
+	public function getCaretakerNodeId(){
+		$instance = $this->getInstance();
+		return 'instance_'.$instance->getUid().'_action_'.$this->getUid();
+	}	
+	
+	/**
 	 * Get the number of available Test Results
 	 *
 	 * @return integer
@@ -319,6 +373,29 @@ class tx_caretaker_ActionNode extends tx_caretaker_AbstractNode {
 		$test_result_repository = tx_caretaker_TestResultRepository::getInstance();
 		$resultRange = $test_result_repository->getResultRangeByInstanceAndTestAndOffset($instance, $this , $offset, $limit);
 		return $resultRange;
+	}
+	
+	/**
+	 * Get the all tests wich can be found below this node
+	 * @return array
+	 * @deprecated This should be only necessary for aggregator nodes
+	 */
+	public function getTestNodes(){
+		return array($this);
+	}
+	
+/**
+	 * Send a notification to all registered notofication services
+	 *
+	 * @param tx_caretaker_TestResult $result
+	 * @param tx_caretaker_TestResult $lastResult
+	 */
+	public function notify ($result, $lastResult = NULL ){
+			// find all registered notification services
+		$notificationServices = tx_caretaker_ServiceHelper::getAllCaretakerNotificationServices();
+		foreach ( $notificationServices as $notificationService ){
+			$notificationService->addNotification( $this, $result, $lastResult );
+		}
 	}
 	
 }

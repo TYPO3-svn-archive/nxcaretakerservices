@@ -81,7 +81,10 @@ tx.nxcaretakerservices.ExtensionManager = function(backpath, nodeid, service, ac
 				    				singleSelect	:	true,
 				    				listeners		: 	{ selectionchange: function(sm) {				              
 										           				var addButton = Ext.getCmp("addFromTerButton");
-										           				if(sm.selections.items.length > 0) 	addButton.enable();
+										           				if(sm.selections.items.length > 0) 	{
+										           					addButton.enable();
+										           					console.log(ExtensionManagerTERGridExpander);
+										           				}
 										           				else addButton.disable();
 						    								}
 				    									}
@@ -450,19 +453,24 @@ tx.nxcaretakerservices.ExtensionManager = function(backpath, nodeid, service, ac
 		});
 	    
 		var ExtensionManagerGrid = new Ext.grid.GridPanel({		   		
-			id			:	"ExtensionManagerGrid",					
-			frame		:	true,		
+			id			:	"ExtensionManagerGrid",
 			title		:	"Extension management",
-			loadMask	: 	true,
+			height		:	700,
 			store		: 	ExtensionManagerGridStore,
 			cm			: 	ExtensionManagerGridColumnModel,
 			sm			: 	ExtensionManagerGridCheckboxSelectionModel,		
 			columnLines	: 	true,
-			height		:	700,			
+			frame		:	true,
+			loadMask	: 	true,
+			onResize	: 	function() {
+								var viewport = Ext.getCmp("viewport");
+								viewport.doLayout();	    			
+							},						
 			view		: 	new Ext.grid.GroupingView({
 						            forceFit			:	true,
 						            startCollapsed 		: 	true,
-						            hideGroupedColumn	: 	true 
+						            hideGroupedColumn	: 	true,
+						            groupTextTpl		: 	'{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
 								}),
 			buttons		: 	[ ExtensionManagerGridRefreshButton ],
 			buttonAlign	:	"center",        		
@@ -476,11 +484,8 @@ tx.nxcaretakerservices.ExtensionManager = function(backpath, nodeid, service, ac
 	            		 	  "-",
 	            		 	  ExtensionManagerGridDeleteButton,
 	            		 	  ExtensionManagerGridAddTERButton
-	            		 	 ],
-	        onResize	: 	function() {
-									var viewport = Ext.getCmp("viewport");
-									viewport.doLayout();	    			
-								}
+	            		 	 ]
+	        
 		});
 		
 		var viewpanel = Ext.getCmp("nxcaretakerAction");

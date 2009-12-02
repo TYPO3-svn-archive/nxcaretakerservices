@@ -16,38 +16,27 @@ $TYPO3_CONF_VARS['BE']['AJAX']['tx_nxcaretakerservices::getActionButtons']    = 
 
 
 $TYPO3_CONF_VARS['EXTCONF']['caretaker']['additionalTabs']['actionTab'] = '{		
-    	    			id:"nxcaretakerAction",
-    	    			title:"Action",
-    	    			xtype    : "panel",    	    			
-    	    			tbar: {	    	    				
-    	    				id		:	"actionToolbar",	
-    	    				layout 	: 	"toolbar",
-    	    				back_path:back_path,    
-    	    				node_id:node_id,	    				
-    	    		            items :  []
-    	    			},    	    			
-    	    			items:[],
-    	    			listeners: {activate:	function(tab){
-    	    				Ext.Ajax.request({
-    	    					url : back_path + "ajax.php",
-    	    					method : "GET",
-    	    					success : function(result, request) {
-    	    						var jsonData = Ext.util.JSON.decode(result.responseText);
-    	    						   	    						
-    	    						var tb = Ext.getCmp("actionToolbar");
-    	    						tb.removeAll();
-    	    						
-    	    						tb.add( jsonData );
-    	    						tb.doLayout();
-    	    					},
-    	    						params: 
-    	    							{ 
-    	    								ajaxID: "tx_nxcaretakerservices::getActionButtons",
-    	    								node:  node_id,
-    	    								back_path: back_path 
-    	    							}
-    	    				}); }
-    	    			}
-    	            }';
+    	    			id			:	"nxcaretakerAction",
+    	    			title		:	"Actions",
+    	    			xtype   	: 	"panel",    	    			
+    	    			tbar		: 	{},
+    	    			listeners	: 	{
+    	    					beforerender :	function(tab){
+					    	    				Ext.Ajax.request({
+					    	    					url 	: 	back_path + "ajax.php",					    	    					
+					    	    					success : 	function(result, request) {					    	    						    					
+								    	    						var jsonData = Ext.util.JSON.decode(result.responseText);
+								    	    						tab.getTopToolbar().add(jsonData);
+								    	    						tab.doLayout();
+								    	    					},
+				    	    						params	:	{ 
+						    	    								ajaxID: "tx_nxcaretakerservices::getActionButtons",
+						    	    								node:  node_id,
+						    	    								back_path: back_path 
+						    	    							}
+					    	    				}); 
+					    	    			}
+    	    						}
+    	            	}';
 
 ?>

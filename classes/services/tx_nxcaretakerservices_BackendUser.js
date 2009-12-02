@@ -401,13 +401,11 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 			            			 ]
 	
 	    		});
-
 		
 	var viewpanel = Ext.getCmp("nxcaretakerAction");
 	viewpanel.removeAll();
 	viewpanel.add(BackendUserGrid);
 	viewpanel.doLayout(); 
-	
+
 	store.load();
-		
 };

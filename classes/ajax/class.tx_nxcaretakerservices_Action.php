@@ -1,7 +1,7 @@
 <?php
 
 require_once (t3lib_extMgm::extPath('caretaker') . '/classes/repositories/class.tx_caretaker_NodeRepository.php');
-require_once (t3lib_extMgm::extPath('caretaker') . '/classes/class.tx_caretaker_Helper.php');
+//require_once (t3lib_extMgm::extPath('caretaker') . '/classes/class.tx_caretaker_Helper.php');
 require_once (t3lib_extMgm::extPath('nxcaretakerservices') . '/classes/nodes/class.tx_caretaker_ActionNode.php');
 
 class tx_nxcaretakerservices_Action {
@@ -12,7 +12,9 @@ class tx_nxcaretakerservices_Action {
 		$node_id = t3lib_div::_GP('node');
 		$action_id = t3lib_div::_GP('actionid');
 	
-		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id)  ){
+		$node_repository = tx_caretaker_NodeRepository::getInstance();
+		
+		if ($node_id && $node = $node_repository->id2node( $node_id , true)  ){
 			 	
 			
 			$serviceText = t3lib_div::_GP('service');
@@ -74,8 +76,8 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 		$back_path = t3lib_div::_GP('back_path');
 	
 		$result = '[';
-		
-		if ($node_id && $node = tx_caretaker_Helper::id2node($node_id) ){
+		$node_repository = tx_caretaker_NodeRepository::getInstance();
+		if ($node_id && $node = $node_repository->id2node( $node_id , true) ){
 
 			$currentInstance = $node->getInstance();
 			if(!$currentInstance) $result = $result . '{text:"Please select an instance."}';
@@ -119,16 +121,20 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 		
 	
 	public function ajaxGetNodeInfo($params, &$ajaxObj){
-			
+				
 			$node_id = t3lib_div::_GP('node');
 			$action_id =  t3lib_div::_GP('actionid');
-			$node = tx_caretaker_Helper::id2node($node_id);
+
+			$node_repository = tx_caretaker_NodeRepository::getInstance();
+			$node = $node_repository->id2node( $node_id , true);
+			//$node = tx_caretaker_Helper::id2node($node_id);
 			$action = $this->getActionsByUid($action_id, $node->getInstance());
 			if($node  && $action)
 			{				
 			$result = $action->updateTestResult(true);
 			$info = '<div>'.
-					'State: '.$result->getLocallizedMessage().'<br/>'.					
+					//'State: '.$result->getLocallizedMessage().'<br/>'.	
+					'State: '.$result->getMessage()->getText().'<br/>'.					
 					'</div>';
 			
 			echo $info;
