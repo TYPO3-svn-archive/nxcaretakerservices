@@ -23,13 +23,12 @@
  ***************************************************************/
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
-require_once (t3lib_extMgm::extPath('caretaker') . '/classes/repositories/class.tx_caretaker_NodeRepository.php');
 
-class tx_nxcaretakerservices_SSLKeyCreatorActionService extends tx_caretakerinstance_RemoteTestServiceBase{
+class tx_nxcaretakerservices_SSLKeyTestService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {		
 		
-		$operation =  array('SSLKeyCreator', array());
+		$operation = array('SSLKeyCreator', array());
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
@@ -50,67 +49,7 @@ class tx_nxcaretakerservices_SSLKeyCreatorActionService extends tx_caretakerinst
 		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
 
 		return $testResult;
-		
 	}	
-	
-	public function action($action, $password='') {
-
-		$operation = array('SSLKeyCreator', array('action' => 'create' ));
-		$operations = array($operation);
-
-		$commandResult = $this->executeRemoteOperations($operations);
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			// error!
-		}
-
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];		
- 		
-		$message = $operationResult->getValue();
-
-		if($operationResult->getValue() == 'key generation failed') return 'key generation failed';
-		
-		$node_id = t3lib_div::_GP('node');
-				
-		$node_repository = tx_caretaker_NodeRepository::getInstance();
-		if ($node_id && $node = $node_repository->id2node( $node_id , true) ){
-			$currentInstance = $node->getInstance();
-			if($currentInstance) {
-				$uid = $currentInstance->getUid();
-				
-				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_caretaker_instance', 'uid = '.(int)$uid, array('public_key' => $message));
-	
-			}
-		}
-		
-		if($res) return 'Successful!';
-		else return 'Error!';
-	}
-	
-	public function doAction($params, &$ajaxObj)
-	{
-		$method = t3lib_div::_GP('method');
-		$Result="";
-		
-		switch ( $method ){
-				
-				case "create":
-					$Result=$this->action('create');
-				break;
-				
-				default:
-					$Result = "none";
-				break;
-			}
-		return $Result;
-	}
-		
-	public function getView($params, &$ajaxObj) {
-		
-		
-		
-		
-	}
 }
 
 ?>
