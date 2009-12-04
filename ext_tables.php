@@ -102,7 +102,7 @@ if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_UpdateNxcaretakerservices',  'TYPO3 -> Update nxcaretakerservices', 'If the nxcaretakerservices extension of the client is older than the servers one, this will update it.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ExtensionManager',  'TYPO3 -> Extension Manager', 'Manage clients extensions.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_DeprecationLog',  'TYPO3 -> Deprecation Log Action', 'enable and disable the deprecation log.');
-	
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_SSLKeyCreator',  'TYPO3 -> Create new SSL keys', 'create new SSL keys.');
 }
 
 
