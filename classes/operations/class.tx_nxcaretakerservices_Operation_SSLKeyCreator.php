@@ -41,30 +41,45 @@ class tx_nxcaretakerservices_Operation_SSLKeyCreator implements tx_caretakerinst
 	 */
 	public function execute($parameter = array()) {										
 
+		$action = $parameter['action'];
+		
+		if($action == 'create'){
 				
-		$cryptoManager = new tx_caretakerinstance_OpenSSLCryptoManager();
-		
-		$keyPair = $cryptoManager->generateKeyPair();
-
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance']);
-		
-		$extConf['crypto.']['instance.']['publicKey'] = $keyPair[0];
-		$extConf['crypto.']['instance.']['privateKey'] = $keyPair[1];
-				
-		//$GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance'] = serialize($extConf);
-		
-		require_once(PATH_t3lib.'class.t3lib_install.php');
-		
-		$instObj = new t3lib_install;
-				$instObj->allowUpdateLocalConf =1;
-				$instObj->updateIdentity = 'nxcaretakerservices->SSLKeyCreator';				
-				
-				$lines = $instObj->writeToLocalconf_control();
-				$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'EXT\'][\'extConf\'][\'caretaker_instance\']', serialize($extConf));		
-				$instObj->writeToLocalconf_control($lines);
-		
-    	return new tx_caretakerinstance_OperationResult(TRUE, $keyPair[0]);
+			$cryptoManager = new tx_caretakerinstance_OpenSSLCryptoManager();
 			
+			$keyPair = $cryptoManager->generateKeyPair();
+	
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance']);
+			
+			$extConf['crypto.']['instance.']['publicKey'] = $keyPair[0];
+			$extConf['crypto.']['instance.']['privateKey'] = $keyPair[1];
+					
+			
+			require_once(PATH_t3lib.'class.t3lib_install.php');
+			
+			$instObj = new t3lib_install;
+					$instObj->allowUpdateLocalConf =1;
+					$instObj->updateIdentity = 'nxcaretakerservices->SSLKeyCreator';				
+					
+					$lines = $instObj->writeToLocalconf_control();
+					$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'EXT\'][\'extConf\'][\'caretaker_instance\']', serialize($extConf));		
+					$instObj->writeToLocalconf_control($lines);
+			if( $keyPair[0])  	return new tx_caretakerinstance_OperationResult(TRUE, $keyPair[0]);
+			else   	return new tx_caretakerinstance_OperationResult(FALSE, 'key generation failed');
+		}
+		
+		else
+		{
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance']);
+			
+			$pub = $extConf['crypto.']['instance.']['publicKey'];
+			if($pub == '-----BEGIN PUBLIC KEY-----|MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCw06+ma8tPh0tLr6zuMgyV+7oJ|i8sZpGDyxCnNRTNezbx4NV0ZkaPUfxikzFGZk9KKga2JRFlYwT3BrSBYeo32q/yN|XgZ4r5LOkYdOgdHi52A0J/Tk35XN+pQM4nR+DQM47r4GEFd2M5E/2fdwV+U1PDM8|4Vy7+zvpdw11Q3vWdwIDAQAB|-----END PUBLIC KEY-----')
+			{
+				return new tx_caretakerinstance_OperationResult(FALSE, 'blacklistet key found!');
+			}
+			else return new tx_caretakerinstance_OperationResult(TRUE, 'no blacklistet key');
+		
+		}
 	}
 }
 ?>

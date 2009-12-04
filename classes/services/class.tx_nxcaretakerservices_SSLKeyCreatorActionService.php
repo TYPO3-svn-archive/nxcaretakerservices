@@ -29,72 +29,62 @@ class tx_nxcaretakerservices_SSLKeyCreatorActionService extends tx_caretakerinst
 	
 	public function runTest() {		
 		
-//		$operation = array('GetInstallTool', array());
-//		$operations = array($operation);
-//
-//		$commandResult = $this->executeRemoteOperations($operations);
-//		if (!$this->isCommandResultSuccessful($commandResult)) {
-//			return $this->getFailedCommandResultTestResult($commandResult);
-//		}
-//
-//		$results = $commandResult->getOperationResults();
-//		$operationResult = $results[0];		
-// 		
-//		$message = $operationResult->getValue();
-//		
-//		if (!$operationResult->isSuccessful()) {	
-//			
-//			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
-//		}
-//
-//		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
-//
-//		return $testResult;
-		return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, 'nothing');
+		$operation =  array('SSLKeyCreator', array('action' => 'test' ));
+		$operations = array($operation);
+
+		$commandResult = $this->executeRemoteOperations($operations);
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			return $this->getFailedCommandResultTestResult($commandResult);
+		}
+
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
+		
+		if (!$operationResult->isSuccessful()) {	
+			
+			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
+		}
+
+		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, $message);
+
+		return $testResult;
+		
 	}	
 	
 	public function action($action, $password='') {
 
-//		$operation = array('SSLKeyCreator', array());
-//		$operations = array($operation);
-//
-//		$commandResult = $this->executeRemoteOperations($operations);
-//		if (!$this->isCommandResultSuccessful($commandResult)) {
-//			// error!
-//		}
-//
-//		$results = $commandResult->getOperationResults();
-//		$operationResult = $results[0];		
-// 		
-//		$message = $operationResult->getValue();
-//				
-//		$node_id = t3lib_div::_GP('node');
-//				
-//		$node_repository = tx_caretaker_NodeRepository::getInstance();
-//		if ($node_id && $node = $node_repository->id2node( $node_id , true) ){
-//			$currentInstance = $node->getInstance();
-//			if($currentInstance) {
-//				$uid = $currentInstance->getUid();
-//				
-//				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_caretaker_instance', 'uid = '.(int)$uid, array('public_key' => $message));
-//	
-//			}
-//		}
-		
-		
-		$privKey = str_replace("|", "\n", "-----BEGIN RSA PRIVATE KEY-----|MIICXQIBAAKBgQCw06+ma8tPh0tLr6zuMgyV+7oJi8sZpGDyxCnNRTNezbx4NV0Z|kaPUfxikzFGZk9KKga2JRFlYwT3BrSBYeo32q/yNXgZ4r5LOkYdOgdHi52A0J/Tk|35XN+pQM4nR+DQM47r4GEFd2M5E/2fdwV+U1PDM84Vy7+zvpdw11Q3vWdwIDAQAB|AoGAYJvnVceDFvpWOw3KL4GMus0DgX+tAV970Gc4Z3wtatiA5jRRn0yg89JUxoUS|+BN5bk8XXu3G2uUJNq2+BFlBAeHLDs2gN1X4vPiGtaLNvqv8CVcOFnBOHubAuPRK|dsyI73v95+ZcfxsX8OVbAh+KSpqEJho7PypY3cXGPvaidzECQQDWRAtt5zscadxV|OqXf7aclWJnaooxPfpPP/Bi7Rfqw4/wF9w2IEPqHiTXBrwaJIcfRM5+eg+zFhWJm|AJ5FTCalAkEA00TSd3UZz53kr2HgsGU7IXVBI2LO26TlVjkuIR96DuS9S781BDCm|4yl0+QLSi8SvSfngONA/muT8L/q3pIFZ6wJAQE8P9x6NuUt0nAgMPReBMU5UbzCW|WE2vY59QdPTd9zWWMNwjrZEbAI8IGWfE2GfRJ1MNN3B1IhuUmvTYjAf9GQJBALpu|OOuBQk2bn3nEfWoraoqT1e9L+g6I7Hex7ar9A9CwuPpmuHoCFMLQipBSlUkRPz2g|auS3n+knuAL+058vJhECQQCb7QELENX68nv08Gs3yx+rDdElkNHxnysaJa2Arvl0|pcq4rEvSbj6+sh/x5z8i4Zn4oYernmn74xRs4ut2jQQb|-----END RSA PRIVATE KEY-----|");
-		$pubKey = str_replace("|", "\n", "-----BEGIN PUBLIC KEY-----|MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCw06+ma8tPh0tLr6zuMgyV+7oJ|i8sZpGDyxCnNRTNezbx4NV0ZkaPUfxikzFGZk9KKga2JRFlYwT3BrSBYeo32q/yN|XgZ4r5LOkYdOgdHi52A0J/Tk35XN+pQM4nR+DQM47r4GEFd2M5E/2fdwV+U1PDM8|4Vy7+zvpdw11Q3vWdwIDAQAB|-----END PUBLIC KEY-----|");		
-		
-		$priv = openssl_pkey_get_private($privKey);
-		$pub = openssl_pkey_get_public($pubKey);
+		$operation = array('SSLKeyCreator', array('action' => 'create' ));
+		$operations = array($operation);
 
-//		openssl_public_encrypt("hallo welt", $encryptedData, $pub);
-//
-//		openssl_private_decrypt($encryptedData, $sensitiveData, $priv);
+		$commandResult = $this->executeRemoteOperations($operations);
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			// error!
+		}
 
-		openssl_open(base64_decode("LIrfr1bs2TK7amHRh/6bLcqLfrdHXaVTj4k9eYX0FdUoQq1qP58KwKcxCk0H0TyDXVgmXWIQPfmS/xgSyrXXICqh0IFHAdrAwakXxw=="), $decrypted, base64_decode("BfdmUzwtgv8PROkX7Fh9d7DsOaRlZ4f4lm8KaqiLaPUIGEfNu+/SnId2MCNIUPxNGnZVIVlfmMMtQ2s+/pMBXsHbq0llj/RogZYtc74AGCAfrqke+eRrpquYPtn+1Mef14QMPnsnzCnIVxOjnRiRkXqpNXtABgQ8agVyCBj/GuA="), $priv);
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
+
+		if($operationResult->getValue() == 'key generation failed') return 'key generation failed';
 		
-		return $decrypted;
+		$node_id = t3lib_div::_GP('node');
+				
+		$node_repository = tx_caretaker_NodeRepository::getInstance();
+		if ($node_id && $node = $node_repository->id2node( $node_id , true) ){
+			$currentInstance = $node->getInstance();
+			if($currentInstance) {
+				$uid = $currentInstance->getUid();
+				
+				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_caretaker_instance', 'uid = '.(int)$uid, array('public_key' => $message));
+	
+			}
+		}
+		
+		if($res) return 'Successful!';
+		else return 'Error!';
 	}
 	
 	public function doAction($params, &$ajaxObj)
