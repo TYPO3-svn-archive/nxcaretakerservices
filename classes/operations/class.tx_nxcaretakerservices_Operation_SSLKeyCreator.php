@@ -70,15 +70,21 @@ class tx_nxcaretakerservices_Operation_SSLKeyCreator implements tx_caretakerinst
 		
 		else
 		{
-			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance']);
-			
-			$pub = $extConf['crypto.']['instance.']['publicKey'];
-			if($pub == '-----BEGIN PUBLIC KEY-----|MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCw06+ma8tPh0tLr6zuMgyV+7oJ|i8sZpGDyxCnNRTNezbx4NV0ZkaPUfxikzFGZk9KKga2JRFlYwT3BrSBYeo32q/yN|XgZ4r5LOkYdOgdHi52A0J/Tk35XN+pQM4nR+DQM47r4GEFd2M5E/2fdwV+U1PDM8|4Vy7+zvpdw11Q3vWdwIDAQAB|-----END PUBLIC KEY-----')
+			if($blacklisted = $parameter['blacklistet'])	
 			{
-				return new tx_caretakerinstance_OperationResult(FALSE, 'blacklistet key found!');
+				$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['caretaker_instance']);
+					
+				$pub = $extConf['crypto.']['instance.']['publicKey'];
+				
+				$foundBlacklistet = FALSE;
+				foreach ($blacklisted as $key) {									
+					if($pub == $key) $foundBlacklistet = TRUE;					
+				}
+				
+				if($foundBlacklistet)	return new tx_caretakerinstance_OperationResult(FALSE, 'blacklistet key found!');					
+				else return new tx_caretakerinstance_OperationResult(TRUE, 'no blacklistet key');
 			}
-			else return new tx_caretakerinstance_OperationResult(TRUE, 'no blacklistet key');
-		
+			else return new tx_caretakerinstance_OperationResult(FALSE, 'wrong parameter');
 		}
 	}
 }

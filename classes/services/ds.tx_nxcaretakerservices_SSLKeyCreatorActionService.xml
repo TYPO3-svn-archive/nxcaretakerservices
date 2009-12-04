@@ -11,7 +11,10 @@
 		<el>
 			<blacklist>
 				<TCEforms>
-					<label>none</label>					
+					<label>Blacklisted keys</label>
+					<config>
+						<type>text</type>
+					</config>					
 				</TCEforms>
 			</blacklist>
 		</el>

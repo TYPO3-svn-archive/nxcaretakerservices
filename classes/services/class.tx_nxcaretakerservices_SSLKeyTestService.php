@@ -28,7 +28,9 @@ class tx_nxcaretakerservices_SSLKeyTestService extends tx_caretakerinstance_Remo
 	
 	public function runTest() {		
 		
-		$operation = array('SSLKeyCreator', array());
+		$blacklisted = explode(chr(10), $this->getConfigValue('blacklist'));
+		
+		$operation = array('SSLKeyCreator', array('blacklistet' => $blacklisted));
 		$operations = array($operation);
 
 		$commandResult = $this->executeRemoteOperations($operations);
