@@ -104,6 +104,7 @@ if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_ExtensionManager',  'TYPO3 -> Extension Manager', 'Manage clients extensions.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_DeprecationLog',  'TYPO3 -> Deprecation Log Action', 'enable and disable the deprecation log.');
 	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_SSLKeyCreator',  'TYPO3 -> Create new SSL keys', 'create new SSL keys.');
+	tx_nxcaretakerservices_ActionServiceHelper::registerCaretakerActionService($_EXTKEY, 'classes/services', 'tx_nxcaretakerservices_AutoBELogin',  'TYPO3 -> Auto backend login', 'open backend and login as admin.');
 }
 
 
