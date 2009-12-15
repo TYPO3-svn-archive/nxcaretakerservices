@@ -174,8 +174,8 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/typo3/');
 				//	echo	 $insertFields;
 				//	die;	
-				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/", TRUE, 307);
-				
+				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
+				die;
 			}	
 				
 			return new tx_caretakerinstance_OperationResult(TRUE,'ids are '.$action);
