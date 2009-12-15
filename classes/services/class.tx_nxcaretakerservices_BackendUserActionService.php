@@ -134,8 +134,10 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 			$params['session'] = $sessionid;
 			$params['ip'] = $clientIp;
 			$params['uid'] = $userid;
+			
+			$hashStr = '';
 			$hashlock = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-			$hashlock = t3lib_div::md5int($hashlock);
+			//$hashlock = t3lib_div::md5int($hashlock);
 			$params['hash'] = $hashlock;
 			
 			$factory = tx_caretakerinstance_ServiceFactory::getInstance();
