@@ -126,8 +126,18 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		if(substr($method, 0, 5) == 'login') 
 		{						
 			//$password = t3lib_div::_GP('password');			
-			//$Result  = $this->Action('reset',substr($method, 6),$password);
+			$lockip  = $this->Action('lockip',false,false);
+			debug($lockip);
 			$clientIp = $_SERVER['REMOTE_ADDR'];
+			$clientIpArray = explode($clientIp) ;
+			
+			if($lockip == 0) $clientIp = '';
+			if($lockip == 1) $clientIp = $clientIpArray[0];
+			if($lockip == 2) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1];
+			if($lockip == 3) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2];
+			if($lockip == 4) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2].'.'.$clientIpArray[3];
+			debug($clientIp);
+			
 			$userid = substr($method, 6);
 			$sessionid = md5(time());
 			$params = array();
@@ -137,7 +147,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 			
 			$hashStr = '';
 			$hashlock = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-			//$hashlock = t3lib_div::md5int($hashlock);
+			
 			$params['hash'] = $hashlock;
 			
 			$factory = tx_caretakerinstance_ServiceFactory::getInstance();
@@ -153,8 +163,8 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 											
 			$sendData = $connector->executeOperations($operations,$instance->getUrl(), $instance->getPublicKey());
 			
-			debug($sessionid);
-			$Result = '<form action="http://dev3.internal.netlogix.de/~elbert/netlogix/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="Login" class="t3-login-submit" tabindex="4" />				</form>';
+			
+			$Result = '<form action="http://dev3.internal.netlogix.de/~elbert/netlogix/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$sessionid.'" class="t3-login-submit" tabindex="4" />				</form>';
 			
 		}
 		
