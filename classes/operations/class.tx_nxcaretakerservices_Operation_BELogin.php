@@ -23,7 +23,7 @@
 ***************************************************************/
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_OperationResult.php'));
-require_once(PATH_t3lib.'class.t3lib_beUserAuth.php');
+//require_once(PATH_t3lib.'class.t3lib_beUserAuth.php');
 /**
  * A simple look after the existence of a file named ENABLE_INSTALL_TOOL in the /typo3con subdirectory
  * 
@@ -41,16 +41,17 @@ class tx_nxcaretakerservices_Operation_BELogin implements tx_caretakerinstance_I
 	public function execute($parameter = array()) {										
 					
 		
-		$BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');	// New backend user object
-		$BE_USER->warningEmail = $TYPO3_CONF_VARS['BE']['warning_email_addr'];
-		$BE_USER->lockIP = $TYPO3_CONF_VARS['BE']['lockIP'];
-		$BE_USER->auth_timeout_field = intval($TYPO3_CONF_VARS['BE']['sessionTimeout']);
-		$BE_USER->OS = TYPO3_OS;
-		$BE_USER->start();			// Object is initialized
-		$BE_USER->checkCLIuser();
-		$BE_USER->backendCheckLogin();	// Checking if there's a user logged in
-		$BE_USER->trackBeUser($TYPO3_CONF_VARS['BE']['trackBeUser']);	// Tracking backend user script hits
-		
+//		$BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');	// New backend user object
+//		$BE_USER = new t3lib_beUserAuth();
+//		$BE_USER->warningEmail = $TYPO3_CONF_VARS['BE']['warning_email_addr'];
+//		$BE_USER->lockIP = $TYPO3_CONF_VARS['BE']['lockIP'];
+//		$BE_USER->auth_timeout_field = intval($TYPO3_CONF_VARS['BE']['sessionTimeout']);
+//		$BE_USER->OS = TYPO3_OS;
+//		$BE_USER->start();			// Object is initialized
+//		$BE_USER->checkCLIuser();
+//		$BE_USER->backendCheckLogin();	// Checking if there's a user logged in
+//		$BE_USER->trackBeUser($TYPO3_CONF_VARS['BE']['trackBeUser']);	// Tracking backend user script hits
+//		
 		
 		
 

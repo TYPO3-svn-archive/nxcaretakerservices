@@ -53,18 +53,18 @@ class tx_nxcaretakerservices_AutoBELoginActionService extends tx_caretakerinstan
 	
 	public function action($action, $password='') {
 
-		$operation = array('BELogin', array());
-		$operations = array($operation);
-
-		$commandResult = $this->executeRemoteOperations($operations);
-		if (!$this->isCommandResultSuccessful($commandResult)) {
-			// error!
-		}
-
-		$results = $commandResult->getOperationResults();
-		$operationResult = $results[0];		
- 		
-		$message = $operationResult->getValue();
+//		$operation = array('BELogin', array());
+//		$operations = array($operation);
+//
+//		$commandResult = $this->executeRemoteOperations($operations);
+//		if (!$this->isCommandResultSuccessful($commandResult)) {
+//			// error!
+//		}
+//
+//		$results = $commandResult->getOperationResults();
+//		$operationResult = $results[0];		
+// 		
+//		$message = $operationResult->getValue();
 		
 	
 		return $message;
@@ -93,6 +93,11 @@ class tx_nxcaretakerservices_AutoBELoginActionService extends tx_caretakerinstan
 		
 		
 	}
+	
+	
+	
+	
+	
 }
 
 ?>

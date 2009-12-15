@@ -83,7 +83,7 @@ tx.nxcaretakerservices.ExtensionManager = function(backpath, nodeid, service, ac
 										           				var addButton = Ext.getCmp("addFromTerButton");
 										           				if(sm.selections.items.length > 0) 	{
 										           					addButton.enable();
-										           					console.log(ExtensionManagerTERGridExpander);
+										           					
 										           				}
 										           				else addButton.disable();
 						    								}

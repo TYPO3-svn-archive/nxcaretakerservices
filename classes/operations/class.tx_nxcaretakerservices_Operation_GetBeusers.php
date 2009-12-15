@@ -152,10 +152,33 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 		    		$tce->process_datamap();
 				}
 			}
+			if($action == 'login')
+			{				
+				$uid = $parameter['params']['uid'];
+				$session = $parameter['params']['session'];
+				$ip = $parameter['params']['ip'];
+				$sessionid = $parameter['params']['sessionid'];
+				
 			
+					$insertFields = array(
+						'ses_id' => $session,
+						'ses_name' => 'be_typo_user',
+						'ses_iplock' => $ip,
+						'ses_hashlock' => '',
+						'ses_userid' => $uid,
+						'ses_tstamp' => $GLOBALS['EXEC_TIME']
+				);
+	
+				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
+				
+				setcookie('be_typo_user', $session, 0, '/');
+								
+				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
+				
+			}	
 				
 			return new tx_caretakerinstance_OperationResult(TRUE,'ids are '.$action);
-		}
+		}		
 		else
 		{
 		

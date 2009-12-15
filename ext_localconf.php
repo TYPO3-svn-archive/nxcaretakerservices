@@ -39,4 +39,26 @@ $TYPO3_CONF_VARS['EXTCONF']['caretaker']['additionalTabs']['actionTab'] = '{
     	    						}
     	            	}';
 
+
+//$TYPO3_CONF_VARS['BE']['loginSecurityLevel'] = 'normal';
+//t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_nxcaretakerservices_AuthService' /* sv key */,
+//	array(
+//
+//		'title' => 'nxcaretakerservices-Authentication',
+//		'description' => 'Authentication service for nxcaretakerservices',
+//
+//		'subtype' => 'getUserBE,authUserBE',
+//
+//		'available' => 1,
+//		'priority' => 100,
+//		'quality' => 50,
+//
+//		'os' => '',
+//		'exec' => '',
+//
+//		'classFile' => t3lib_extMgm::extPath($_EXTKEY).'classes/auth/class.tx_nxcaretakerservices_AuthService.php',
+//		'className' => 'tx_nxcaretakerservices_AuthService',
+//	)
+//);
+
 ?>

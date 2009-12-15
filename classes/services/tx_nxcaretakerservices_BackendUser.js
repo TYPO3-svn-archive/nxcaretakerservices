@@ -18,7 +18,17 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 		proxy		: 	new Ext.data.HttpProxy({url: backpath + "ajax.php?ajaxID=tx_nxcaretakerservices::doaction&node=" + nodeid + "&actionid=" + actionid + "&service=" + service + "&method=getUser"})         		
 	});
 	
-	var BackendUserCheckboxSelectionModel = new Ext.grid.CheckboxSelectionModel();
+	var BackendUserCheckboxSelectionModel = new Ext.grid.CheckboxSelectionModel({
+		singleSelect	:	true,
+		listeners		: 	{ selectionchange: function(sm) {				              
+			           				var loginButton = Ext.getCmp("BackendUserLoginButton");
+			           				if(sm.selections.items.length == 1) 	{
+			           					loginButton.enable();			           					
+			           				}
+			           				else loginButton.disable();
+								}
+							}
+	});
 	
 	var BackendUserColumnModel = new Ext.grid.ColumnModel({
 		columns		:	[
@@ -58,7 +68,8 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 			Ext.Ajax.request({
 					url			: 	backpath + "ajax.php",
 					success 	: 	function (response, opts){
-											store.load();							       								       								
+											//store.load();	
+											Ext.MessageBox.alert("Status", response.responseText, function(){ store.load();});
 										}, 
 					params		: 	{ 
 						ajaxID		: 	"tx_nxcaretakerservices::doaction",
@@ -312,6 +323,16 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 	        win.show(this);
 		}
 	};
+
+	var BackendUserLoginButton = ({
+		id			:	"BackendUserLoginButton",
+		text		:	"Login",
+		tooltip		:	"Login as selected user",
+		disabled	:	true,
+		icon    	: 	nxparams["adminImg"],
+		cmd			:	"login",
+		handler		:	BackendUserSelectionClickHandler
+	});
 	
 	var BackendUserEnableButton = ({
 		text		:	"Enable",
@@ -397,7 +418,9 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 			            			 	   BackendUserDeleteButton,
 			            			 	   BackendUserAddButton,
 			            			 	   "-",
-			            			 	   BackendUserResetPasswordButton	
+			            			 	   BackendUserResetPasswordButton,	
+			            			 	   "-",
+			            			 	   BackendUserLoginButton
 			            			 ]
 	
 	    		});

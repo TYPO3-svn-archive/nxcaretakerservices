@@ -23,7 +23,8 @@
  ***************************************************************/
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
-
+require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_ServiceFactory.php'));
+require_once(t3lib_extMgm::extPath('nxcaretakerservices', 'classes/auth/class.tx_nxcaretakerservices_RemoteCommandConnector.php'));
 
 class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
@@ -65,7 +66,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, '');
 	}
 	
-	public function Action($action,$ids, $params)
+	public function Action($action,$ids, $params = false)
 	{
 		$operation = array('GetBeusers', array('action' => $action,'ids' => $ids, 'params'=>$params));
 		$operations = array($operation);
@@ -122,6 +123,37 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 			$password = t3lib_div::_GP('password');			
 			$Result  = $this->Action('reset',substr($method, 6),$password);
 		}
+		if(substr($method, 0, 5) == 'login') 
+		{						
+			//$password = t3lib_div::_GP('password');			
+			//$Result  = $this->Action('reset',substr($method, 6),$password);
+			$clientIp = $_SERVER['REMOTE_ADDR'];
+			$userid = substr($method, 6);
+			$sessionid = md5(time());
+			$params = array();
+			$params['session'] = $sessionid;
+			$params['ip'] = $clientIp;
+			$params['uid'] = $userid;
+			//$Result  = $this->Action('login',$userid,$params);
+			
+							
+			$factory = tx_caretakerinstance_ServiceFactory::getInstance();
+			$cryptoManager = $factory->getCryptoManager();
+			$securityManager = $factory->getSecurityManager();
+			$connector = new tx_nxcaretakerservices_RemoteCommandConnector($cryptoManager, $securityManager);
+			$operation = array('GetBeusers', array('action' => 'login', 'params' => $params));
+			$operations = array($operation);
+			$node_id = t3lib_div::_GP('node');
+			$node_repository = tx_caretaker_NodeRepository::getInstance();		
+			$node = $node_repository->id2node( $node_id , true);
+			$instance = $node->getInstance();
+											
+			$sendData = $connector->executeOperations($operations,$instance->getUrl(), $instance->getPublicKey());
+			
+			
+			$Result = '<form action="http://dev3.internal.netlogix.de/~elbert/caretaker/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="Login" class="t3-login-submit" tabindex="4" />				</form>';
+			
+		}
 		
 		return $Result;
 	}
@@ -162,6 +194,9 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 	public function getView($params, &$ajaxObj) {
 		
 	}
+	
+	
+	
 	
 }
 
