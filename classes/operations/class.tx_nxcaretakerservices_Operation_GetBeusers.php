@@ -158,8 +158,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$session = $parameter['params']['session'];
 				$ip = $parameter['params']['ip'];
 				$sessionid = $parameter['params']['sessionid'];
-				$hashlock = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-				$hashlock = t3lib_div::md5int($hashlock);
+				$hashlock = $parameter['params']['hash'];
 				
 				$insertFields = array(
 						'ses_id' => $session,
