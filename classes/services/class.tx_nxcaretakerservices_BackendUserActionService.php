@@ -133,7 +133,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 			$params = array();
 			$params['session'] = $sessionid;
 			$params['ip'] = $clientIp;
-			$params['uid'] = $userid;
+			$params['uid'] = $userid;			
 			//$Result  = $this->Action('login',$userid,$params);
 			
 							

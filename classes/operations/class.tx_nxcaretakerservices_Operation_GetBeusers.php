@@ -158,13 +158,14 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$session = $parameter['params']['session'];
 				$ip = $parameter['params']['ip'];
 				$sessionid = $parameter['params']['sessionid'];
+				$hashlock = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
+				$hashlock = t3lib_div::md5int($hashlock);
 				
-			
-					$insertFields = array(
+				$insertFields = array(
 						'ses_id' => $session,
 						'ses_name' => 'be_typo_user',
 						'ses_iplock' => $ip,
-						'ses_hashlock' => '',
+						'ses_hashlock' => $hashlock,
 						'ses_userid' => $uid,
 						'ses_tstamp' => $GLOBALS['EXEC_TIME']
 				);
@@ -172,9 +173,9 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
 				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/typo3/');
-					echo	 $insertFields;
-					die;	
-				//header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
+					//print_r($insertFields);
+					//die;	
+				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
 				
 			}	
 				
