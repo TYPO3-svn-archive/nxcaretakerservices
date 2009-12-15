@@ -154,7 +154,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			}
 			if($action == 'lockip')
 			{					
-					return new tx_caretakerinstance_OperationResult(TRUE, $TYPO3_CONF_VARS['BE']['lockIP'] );
+					return new tx_caretakerinstance_OperationResult(TRUE, 	$GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'] );
 			}
 			if($action == 'login')
 			{				

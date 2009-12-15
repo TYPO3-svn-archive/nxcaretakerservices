@@ -126,11 +126,10 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		if(substr($method, 0, 5) == 'login') 
 		{						
 			//$password = t3lib_div::_GP('password');			
-			$lockip  = $this->Action('lockip',false,false);
+			$lockip  = $this->Action('lockip','',false);
 			debug($lockip);
 			$clientIp = $_SERVER['REMOTE_ADDR'];
-			$clientIpArray = explode($clientIp) ;
-			
+			$clientIpArray = explode('.',$clientIp) ;			
 			if($lockip == 0) $clientIp = '';
 			if($lockip == 1) $clientIp = $clientIpArray[0];
 			if($lockip == 2) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1];
