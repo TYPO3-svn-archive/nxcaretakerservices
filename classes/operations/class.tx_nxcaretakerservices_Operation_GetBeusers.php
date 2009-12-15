@@ -167,30 +167,30 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$hashlockmd5 = t3lib_div::md5int($hashlock);
 				$hashlockclientmd5 = t3lib_div::md5int($hashlockclient);
 				
-				print_r(array(
-					'hashclient' => $hashlockclient,
-					'hashserver' => $hashlock,
-					'hashclientmd5' => $hashlockclientmd5,
-					'hashservermd5' => $hashlockmd5
-				));
-				die;
+//				print_r(array(
+//					'hashclient' => $hashlockclient,
+//					'hashserver' => $hashlock,
+//					'hashclientmd5' => $hashlockclientmd5,
+//					'hashservermd5' => $hashlockmd5
+//				));
+//				
 				
 				$insertFields = array(
 						'ses_id' => $session,
 						'ses_name' => 'be_typo_user',
 						'ses_iplock' => $ip,
-						'ses_hashlock' => $hashlock,
+						'ses_hashlock' => $hashlockmd5,
 						'ses_userid' => $uid,
 						'ses_tstamp' => $GLOBALS['EXEC_TIME']
 				);
 	
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
-				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/typo3/');
+				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/');
 					//print_r($insertFields);
 					//die;	
 				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
-				
+				die;
 			}	
 				
 			return new tx_caretakerinstance_OperationResult(TRUE,'ids are '.$action);
