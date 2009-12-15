@@ -168,13 +168,13 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 						'ses_userid' => $uid,
 						'ses_tstamp' => $GLOBALS['EXEC_TIME']
 				);
-	debug($insertFields);
+	
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
 				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/typo3/');
-					echo	 $insertFields;
-					die;	
-				//header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
+				//	echo	 $insertFields;
+				//	die;	
+				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/", TRUE, 307);
 				
 			}	
 				
