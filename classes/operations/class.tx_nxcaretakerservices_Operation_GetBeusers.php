@@ -184,7 +184,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			{	
 				
 				$session = $parameter['params']['session'];
-				setcookie('be_typo_user', $session, 0, '/'); //~elbert/netlogix/
+				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/'); 
 
 				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
 				$backend = $confArray['instanceBackendUrl'];
