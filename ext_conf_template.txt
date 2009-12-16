@@ -1,2 +1,5 @@
 # cat=nxcaretakerservices; type=boolean; label=Enable Caretaker Server Extensions
 enableServerExt = 0
+
+# cat=basic/enable; type=string; label= Caretaker Instance Backend URL : Is used to enable the caretaker server login in the instance backend
+instanceBackendUrl=

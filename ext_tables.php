@@ -88,10 +88,11 @@ if($confArray['enableServerExt'])
 	    )
 )
 ;
+
 	
   t3lib_extMgm::addTCAcolumns("tx_caretaker_instance",$tempColumns,1);
-  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_nxcaretakerservices_actions;;;;1-1-1",'',"before:notifications,--palette--;;4,after:test");
-	
+  t3lib_extMgm::addToAllTCAtypes("tx_caretaker_instance","tx_nxcaretakerservices_actions;;;;1-1-1",'',"before:groups,--palette--;;4,after:public_key");
+
 	
 }
 if (t3lib_extMgm::isLoaded('nxcaretakerservices') ){

@@ -40,7 +40,8 @@
 			<label index="tx_caretaker_action.instances">Include Test for those Instances</label>
 			<label index="tx_caretaker_action.groups">Include Test for those Testgroups</label>
 			<label index="tx_caretaker_action.notifications">Notifications</label>
-			<label index="tx_caretaker_instanceaction.actions">Actions</label>			
+			<label index="tx_caretaker_instanceaction.actions">Actions</label>	
+			<label index="tx_caretaker_instanceaction.backendUrl">Backend URL</label>			
 		</languageKey>
 		<languageKey index="de" type="array">
 

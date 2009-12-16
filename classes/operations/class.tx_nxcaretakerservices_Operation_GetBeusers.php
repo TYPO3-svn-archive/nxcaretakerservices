@@ -152,32 +152,25 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 		    		$tce->process_datamap();
 				}
 			}
-			if($action == 'lockip')
-			{					
-					return new tx_caretakerinstance_OperationResult(TRUE, 	$GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'] );
+			if($action == 'prepareLogin')
+			{	
+				$prepare = array('lockip' => $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP']);	
+					
+				return new tx_caretakerinstance_OperationResult(TRUE, 	$prepare );
 			}
 			if($action == 'login')
-			{				
+			{	
+				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
+				$backend = $confArray['instanceBackendUrl'];
+							
 				$uid = $parameter['params']['uid'];
 				$session = $parameter['params']['session'];
 				$ip = $parameter['params']['ip'];
 				$sessionid = $parameter['params']['sessionid'];
-				$hashStr ='';
-				$hashlockclient = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-			
 				
-				$hashlock = $parameter['params']['hash'];
-								
+				$hashlock = $parameter['params']['hash'];								
 				$hashlockmd5 = t3lib_div::md5int($hashlock);
-				$hashlockclientmd5 = t3lib_div::md5int($hashlockclient);
 				
-//				print_r(array(
-//					'hashclient' => $hashlockclient,
-//					'hashserver' => $hashlock,
-//					'hashclientmd5' => $hashlockclientmd5,
-//					'hashservermd5' => $hashlockmd5
-//				));
-//				
 				
 				$insertFields = array(
 						'ses_id' => $session,
@@ -191,9 +184,8 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
 				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/');
-					//print_r($insertFields);
-					//die;	
-				header("Location: http://dev3.internal.netlogix.de/~elbert/netlogix/typo3/");
+						
+				header("Location: " . $backend);
 				die;
 			}	
 				
