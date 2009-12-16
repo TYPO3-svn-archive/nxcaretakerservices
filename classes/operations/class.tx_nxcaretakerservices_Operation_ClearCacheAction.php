@@ -23,7 +23,7 @@
 ***************************************************************/
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caretakerinstance_OperationResult.php'));
-//require_once(PATH_t3lib.'class.t3lib_beUserAuth.php');
+
 /**
  * A simple look after the existence of a file named ENABLE_INSTALL_TOOL in the /typo3con subdirectory
  * 
@@ -31,7 +31,7 @@ require_once(t3lib_extMgm::extPath('caretaker_instance', 'classes/class.tx_caret
  * @package		TYPO3
  * @subpackage	tx_caretakerinstance
  */
-class tx_nxcaretakerservices_Operation_BELogin implements tx_caretakerinstance_IOperation {
+class tx_nxcaretakerservices_Operation_ClearCacheAction implements tx_caretakerinstance_IOperation {
 
 		
 	/**
@@ -40,26 +40,51 @@ class tx_nxcaretakerservices_Operation_BELogin implements tx_caretakerinstance_I
 	 */
 	public function execute($parameter = array()) {										
 					
+		$action = $parameter['action'];
+			
+		$this->includeTCA();
+			
+		require_once (PATH_t3lib."class.t3lib_userauthgroup.php");
+		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
+		$GLOBALS['BE_USER']->user['admin'] = true;
 		
-//		$BE_USER = t3lib_div::makeInstance('t3lib_beUserAuth');	// New backend user object
-//		$BE_USER = new t3lib_beUserAuth();
-//		$BE_USER->warningEmail = $TYPO3_CONF_VARS['BE']['warning_email_addr'];
-//		$BE_USER->lockIP = $TYPO3_CONF_VARS['BE']['lockIP'];
-//		$BE_USER->auth_timeout_field = intval($TYPO3_CONF_VARS['BE']['sessionTimeout']);
-//		$BE_USER->OS = TYPO3_OS;
-//		$BE_USER->start();			// Object is initialized
-//		$BE_USER->checkCLIuser();
-//		$BE_USER->backendCheckLogin();	// Checking if there's a user logged in
-//		$BE_USER->trackBeUser($TYPO3_CONF_VARS['BE']['trackBeUser']);	// Tracking backend user script hits
-//		
+		$tce = t3lib_div::makeInstance('t3lib_TCEmain');							
+		$tce->stripslashes_values = 0;		
+		$tce->start(array(),array());	
+
+		if($action == 'all')
+		{
+			$tce->clear_cacheCmd('all');
+						
+			return new tx_caretakerinstance_OperationResult(TRUE, 'cleared all caches.');			
+		}
 		
+		if($action == 'page')
+		{
+			$tce->clear_cacheCmd('pages');
+						
+			return new tx_caretakerinstance_OperationResult(TRUE, 'cleared pages cache.');	
+		}		
+		if($action == 'conf')
+		{						
+			$tce->clear_cacheCmd('temp_CACHED');
+						
+			return new tx_caretakerinstance_OperationResult(TRUE, 'cleared temp_CACHED cache.');	
+		}
+	}
+	
+	protected function includeTCA() {
+		require_once(PATH_tslib.'class.tslib_fe.php');
+		
+		require_once(PATH_t3lib.'class.t3lib_cs.php');
+		require_once(PATH_t3lib.'class.t3lib_userauth.php');
+		require_once(PATH_tslib.'class.tslib_feuserauth.php');
 		
 
-		if (!file_exists($filename)) {
-    		return new tx_caretakerinstance_OperationResult(TRUE, $filename . ' file doesnt exist!');
-		} else {
-    		return new tx_caretakerinstance_OperationResult(FALSE, $filename . ' file exists!');
-		}	
+			// Make new instance of TSFE object for initializing user:
+		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
+		$TSFE = new $temp_TSFEclassName($TYPO3_CONF_VARS,0,0);
+		$TSFE->includeTCA();
 	}
 }
 ?>

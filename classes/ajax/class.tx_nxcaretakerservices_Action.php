@@ -103,6 +103,9 @@ public function ajaxGetActionButtons($params, &$ajaxObj){
 	           				nxparams["adminImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users_admin.gif', '', 1).'";
 	           				nxparams["userImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/i/be_users.gif', '', 1).'";
 	           				nxparams["addImg"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/new_el.gif', '', 1).'";
+	           				nxparams["lred"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/lightning_red.png', '', 1).'";
+	           				nxparams["lyellow"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/lightning.png', '', 1).'";
+	           				nxparams["lgreen"] = "'.$back_path.'"+"'.t3lib_iconWorks::skinImg('', 'gfx/lightning_green.png', '', 1).'";
 	           				
 	           				var successFunction = function(response) {								
 								eval(response.responseText);

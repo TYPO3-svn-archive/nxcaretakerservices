@@ -24,80 +24,43 @@
 
 require_once(t3lib_extMgm::extPath('caretaker_instance', 'services/class.tx_caretakerinstance_RemoteTestServiceBase.php'));
 
-class tx_nxcaretakerservices_AutoBELoginActionService extends tx_caretakerinstance_RemoteTestServiceBase{
+class tx_nxcaretakerservices_ClearCacheActionService extends tx_caretakerinstance_RemoteTestServiceBase{
 	
 	public function runTest() {		
-		
-//		$operation = array('GetInstallTool', array());
-//		$operations = array($operation);
-//
-//		$commandResult = $this->executeRemoteOperations($operations);
-//		if (!$this->isCommandResultSuccessful($commandResult)) {
-//			return $this->getFailedCommandResultTestResult($commandResult);
-//		}
-//
-//		$results = $commandResult->getOperationResults();
-//		$operationResult = $results[0];		
-// 		
-//		$message = $operationResult->getValue();
-//		
-//		if (!$operationResult->isSuccessful()) {	
-//			
-//			return tx_caretaker_TestResult::create(TX_CARETAKER_STATE_ERROR, 0, $message);
-//		}
-
-		$testResult = tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, "nothing");
-
-		return $testResult;
+	
+		return  tx_caretaker_TestResult::create(TX_CARETAKER_STATE_OK, 0, 'nothing');;
 	}	
 	
 	public function action($action, $password='') {
 
-//		$operation = array('BELogin', array());
-//		$operations = array($operation);
-//
-//		$commandResult = $this->executeRemoteOperations($operations);
-//		if (!$this->isCommandResultSuccessful($commandResult)) {
-//			// error!
-//		}
-//
-//		$results = $commandResult->getOperationResults();
-//		$operationResult = $results[0];		
-// 		
-//		$message = $operationResult->getValue();
+		$operation = array('ClearCacheAction', array('action' => $action));
+		$operations = array($operation);
+
+		$commandResult = $this->executeRemoteOperations($operations);
+		if (!$this->isCommandResultSuccessful($commandResult)) {
+			// error!
+		}
+
+		$results = $commandResult->getOperationResults();
+		$operationResult = $results[0];		
+ 		
+		$message = $operationResult->getValue();
 		
-	
 		return $message;
 	}
 	
 	public function doAction($params, &$ajaxObj)
 	{
 		$method = t3lib_div::_GP('method');
-		$Result="";
 		
-		switch ( $method ){
-				case "login":
-					$Result=$this->action('login');
-				break;
-				
-				default:
-					$Result = "none";
-				break;
-			}
+		$Result = $this->action($method);
+		
 		return $Result;
 	}
 		
 	public function getView($params, &$ajaxObj) {
 		
-		
-		
-		
 	}
-	
-	
-	
-	
-	
 }
 
 ?>
