@@ -178,7 +178,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 	
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
-				return new tx_caretakerinstance_OperationResult(TRUE, 	$prepare );
+				return new tx_caretakerinstance_OperationResult(TRUE, 	'ok' );
 			}
 			if($action == 'login')
 			{	
