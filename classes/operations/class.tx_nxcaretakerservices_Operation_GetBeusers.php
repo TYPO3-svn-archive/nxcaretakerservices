@@ -154,6 +154,11 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			}
 			if($action == 'prepareLogin')
 			{	
+				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
+				$backend = $confArray['instanceBackendUrl'];
+				
+				if(!$backend) return new tx_caretakerinstance_OperationResult(FALSE, 	'No backend url inserted at the instance.' );
+				
 				$lockip = $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'];					
 				$userid = $parameter['params']['userid'];
 				$session = $parameter['params']['session'];
@@ -182,9 +187,13 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			}
 			if($action == 'login')
 			{	
+				$siturl = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+				$host = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST');
+				
+				$cookieHost = str_replace($host, '', $siturl);
 				
 				$session = $parameter['params']['session'];
-				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/'); 
+				setcookie('be_typo_user', $session, 0, $cookieHost); 
 
 				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
 				$backend = $confArray['instanceBackendUrl'];

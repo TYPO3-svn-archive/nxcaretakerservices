@@ -22,7 +22,7 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 		singleSelect	:	true,
 		listeners		: 	{ selectionchange: function(sm) {				              
 			           				var loginButton = Ext.getCmp("BackendUserLoginButton");
-			           				if(sm.selections.items.length == 1) 	{
+			           				if(sm.selections.items.length == 1 && sm.selections.items[0].get("disable") == 0) 	{
 			           					loginButton.enable();			           					
 			           				}
 			           				else loginButton.disable();
