@@ -67,9 +67,9 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 
 			Ext.Ajax.request({
 					url			: 	backpath + "ajax.php",
-					success 	: 	function (response, opts){
-											//store.load();	
-											Ext.MessageBox.alert("Status", response.responseText, function(){ store.load();});
+					success 	: 	function (response, opts){											
+											if(btn.alert) Ext.MessageBox.alert("Status", response.responseText, function(){ store.load();});
+											else store.load();
 										}, 
 					params		: 	{ 
 						ajaxID		: 	"tx_nxcaretakerservices::doaction",
@@ -331,6 +331,7 @@ tx.nxcaretakerservices.BackendUser = function(backpath, nodeid, service, actioni
 		disabled	:	true,
 		icon    	: 	nxparams["adminImg"],
 		cmd			:	"login",
+		alert		:	true,
 		handler		:	BackendUserSelectionClickHandler
 	});
 	

@@ -183,29 +183,8 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			if($action == 'login')
 			{	
 				
-							
-//				$uid = $parameter['params']['uid'];
-//				$session = $parameter['params']['session'];
-//				$ip = $parameter['params']['ip'];
-//				$sessionid = $parameter['params']['sessionid'];
-//				
-//				$hashlock = $parameter['params']['hash'];								
-//				$hashlockmd5 = t3lib_div::md5int($hashlock);
-//				
-//				
-//				$insertFields = array(
-//						'ses_id' => $session,
-//						'ses_name' => 'be_typo_user',
-//						'ses_iplock' => $ip,
-//						'ses_hashlock' => $hashlockmd5,
-//						'ses_userid' => $uid,
-//						'ses_tstamp' => $GLOBALS['EXEC_TIME']
-//				);
-//	
-//				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
-				
 				$session = $parameter['params']['session'];
-				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/');
+				setcookie('be_typo_user', $session, 0, '/'); //~elbert/netlogix/
 
 				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
 				$backend = $confArray['instanceBackendUrl'];
