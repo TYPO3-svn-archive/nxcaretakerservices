@@ -154,38 +154,64 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			}
 			if($action == 'prepareLogin')
 			{	
-				$prepare = array('lockip' => $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP']);	
-					
-				return new tx_caretakerinstance_OperationResult(TRUE, 	$prepare );
-			}
-			if($action == 'login')
-			{	
-				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
-				$backend = $confArray['instanceBackendUrl'];
-							
-				$uid = $parameter['params']['uid'];
+				$lockip = $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'];					
+				$userid = $parameter['params']['userid'];
 				$session = $parameter['params']['session'];
-				$ip = $parameter['params']['ip'];
-				$sessionid = $parameter['params']['sessionid'];
-				
-				$hashlock = $parameter['params']['hash'];								
-				$hashlockmd5 = t3lib_div::md5int($hashlock);
-				
-				
+				$clientIp = $parameter['params']['clientip'];
+				$hashlockmd5 = t3lib_div::md5int($parameter['params']['hash']);
+
+				$clientIpArray = explode('.',$clientIp) ;			
+				if($lockip == 0) $clientIp = '';
+				if($lockip == 1) $clientIp = $clientIpArray[0];
+				if($lockip == 2) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1];
+				if($lockip == 3) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2];
+				if($lockip == 4) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2].'.'.$clientIpArray[3];
+								
 				$insertFields = array(
 						'ses_id' => $session,
 						'ses_name' => 'be_typo_user',
-						'ses_iplock' => $ip,
+						'ses_iplock' => $clientIp,
 						'ses_hashlock' => $hashlockmd5,
-						'ses_userid' => $uid,
+						'ses_userid' => $userid,
 						'ses_tstamp' => $GLOBALS['EXEC_TIME']
 				);
 	
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 				
+				return new tx_caretakerinstance_OperationResult(TRUE, 	$prepare );
+			}
+			if($action == 'login')
+			{	
+				
+							
+//				$uid = $parameter['params']['uid'];
+//				$session = $parameter['params']['session'];
+//				$ip = $parameter['params']['ip'];
+//				$sessionid = $parameter['params']['sessionid'];
+//				
+//				$hashlock = $parameter['params']['hash'];								
+//				$hashlockmd5 = t3lib_div::md5int($hashlock);
+//				
+//				
+//				$insertFields = array(
+//						'ses_id' => $session,
+//						'ses_name' => 'be_typo_user',
+//						'ses_iplock' => $ip,
+//						'ses_hashlock' => $hashlockmd5,
+//						'ses_userid' => $uid,
+//						'ses_tstamp' => $GLOBALS['EXEC_TIME']
+//				);
+//	
+//				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
+				
+				$session = $parameter['params']['session'];
 				setcookie('be_typo_user', $session, 0, '/~elbert/netlogix/');
-						
+
+				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
+				$backend = $confArray['instanceBackendUrl'];
+								
 				header("Location: " . $backend);
+				
 				die;
 			}	
 				

@@ -124,47 +124,34 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 			$Result  = $this->Action('reset',substr($method, 6),$password);
 		}
 		if(substr($method, 0, 5) == 'login') 
-		{						
-			//$password = t3lib_div::_GP('password');			
-			$prepare  = $this->Action('prepareLogin','',false);
-			$lockip = $prepare['lockip'];
-						
-			$clientIp = $_SERVER['REMOTE_ADDR'];
-			$clientIpArray = explode('.',$clientIp) ;			
-			if($lockip == 0) $clientIp = '';
-			if($lockip == 1) $clientIp = $clientIpArray[0];
-			if($lockip == 2) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1];
-			if($lockip == 3) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2];
-			if($lockip == 4) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2].'.'.$clientIpArray[3];
-						
-			$userid = substr($method, 6);
+		{	
 			$sessionid = md5(time());
 			$params = array();
 			$params['session'] = $sessionid;
-			$params['ip'] = $clientIp;
-			$params['uid'] = $userid;
+			$params['clientip'] = $_SERVER['REMOTE_ADDR'];
+			$params['userid'] = substr($method, 6);			
+			$params['hash'] = ':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
+					
+			$prepare  = $this->Action('prepareLogin',substr($method, 6),$params);
 			
-			$hashStr = '';
-			$hashlock = $hashStr.=':'.t3lib_div::getIndpEnv('HTTP_USER_AGENT');
-			
-			$params['hash'] = $hashlock;
-			
-			$factory = tx_caretakerinstance_ServiceFactory::getInstance();
-			$cryptoManager = $factory->getCryptoManager();
-			$securityManager = $factory->getSecurityManager();
-			$connector = new tx_nxcaretakerservices_RemoteCommandConnector($cryptoManager, $securityManager);
-			$operation = array('GetBeusers', array('action' => 'login', 'params' => $params));
-			$operations = array($operation);
-			$node_id = t3lib_div::_GP('node');
-			$node_repository = tx_caretaker_NodeRepository::getInstance();		
-			$node = $node_repository->id2node( $node_id , true);
-			$instance = $node->getInstance();
-											
-			$sendData = $connector->executeOperations($operations,$instance->getUrl(), $instance->getPublicKey());
-			
-			
-			$Result = '<form action="'.$instance->getUrl().'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$sessionid.'" class="t3-login-submit" tabindex="4" />				</form>';
-			
+			if($prepare == 'ok')
+			{
+				$factory = tx_caretakerinstance_ServiceFactory::getInstance();
+				$cryptoManager = $factory->getCryptoManager();
+				$securityManager = $factory->getSecurityManager();
+				$connector = new tx_nxcaretakerservices_RemoteCommandConnector($cryptoManager, $securityManager);
+				$operation = array('GetBeusers', array('action' => 'login', 'params' => $params));
+				$operations = array($operation);
+				$node_id = t3lib_div::_GP('node');
+				$node_repository = tx_caretaker_NodeRepository::getInstance();		
+				$node = $node_repository->id2node( $node_id , true);
+				$instance = $node->getInstance();
+												
+				$sendData = $connector->executeOperations($operations,$instance->getUrl(), $instance->getPublicKey());
+								
+				$Result = '<form action="'.$instance->getUrl().'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$instance->getHostname().'" class="t3-login-submit" tabindex="4" />				</form>';
+			}
+			else return 'Error preparing Login';
 		}
 		
 		return $Result;
