@@ -175,26 +175,17 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				if($lockip == 3) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2];
 				if($lockip == 4) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2].'.'.$clientIpArray[3];
 								
-//				$insertFields = array(
-//						'ses_id' => $session,
-//						'ses_name' => 'be_typo_user',
-//						'ses_iplock' => $clientIp,
-//						'ses_hashlock' => $hashlockmd5,
-//						'ses_userid' => $userid,
-//						'ses_tstamp' => $GLOBALS['EXEC_TIME']
-//				);
-//	
-//				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
-				$data = array('be_sessions' => array('NEW' => 
-				array(	'ses_id' => $session,
+				$insertFields = array(
+						'ses_id' => $session,
 						'ses_name' => 'be_typo_user',
 						'ses_iplock' => $clientIp,
 						'ses_hashlock' => $hashlockmd5,
 						'ses_userid' => $userid,
-						'ses_tstamp' => $GLOBALS['EXEC_TIME'])));
+						'ses_tstamp' => $GLOBALS['EXEC_TIME']
+				);
+	
+				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
 			
-		    	$tce->start($data,array());				
-		    	$tce->process_datamap();
 			    	
 				return new tx_caretakerinstance_OperationResult(TRUE, 	'ok' );
 			}
