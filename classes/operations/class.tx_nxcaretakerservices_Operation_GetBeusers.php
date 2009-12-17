@@ -85,9 +85,9 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 					$data = array($table => array($id=>array('disable'=>0)));
 				
 			    	$tce->start($data,array());
-			    	$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;		
+			    	
 			    	$tce->process_datamap();
-			    	$action = $GLOBALS['TYPO3_DB']->debug_lastBuiltQuery;
+			    	$action = $GLOBALS['BE_USER']->workspace;
 				}
 			}
 			if($action == 'disable')
@@ -97,9 +97,9 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 					$data = array($table => array($id=>array('disable'=>1)));
 				
 			    	$tce->start($data,array());
-			    	$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;						
+			    					
 			    	$tce->process_datamap();
-			    	$action = $GLOBALS['TYPO3_DB']->debug_lastBuiltQuery;
+			    	$action = $GLOBALS['BE_USER']->workspace;
 				}
 			}
 			if($action == 'enableAdmin')
