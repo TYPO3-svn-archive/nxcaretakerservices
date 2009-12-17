@@ -71,6 +71,7 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 		require_once (PATH_t3lib."class.t3lib_userauthgroup.php");
 		$GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_beUserAuth');
 		$GLOBALS['BE_USER']->user['admin'] = true;
+		$GLOBALS['BE_USER']->setWorkspace(0);
 		
 		$tce = t3lib_div::makeInstance('t3lib_TCEmain');							
 		$tce->stripslashes_values = 0;		
@@ -84,10 +85,9 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				{					
 					$data = array($table => array($id=>array('disable'=>0)));
 				
-			    	$tce->start($data,array());
-			    	
+			    	$tce->start($data,array());			    	
 			    	$tce->process_datamap();
-			    	$action = $GLOBALS['BE_USER']->workspace;
+			    	
 				}
 			}
 			if($action == 'disable')
@@ -96,10 +96,9 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				{					
 					$data = array($table => array($id=>array('disable'=>1)));
 				
-			    	$tce->start($data,array());
-			    					
+			    	$tce->start($data,array());			    					
 			    	$tce->process_datamap();
-			    	$action = $GLOBALS['BE_USER']->workspace;
+			    	
 				}
 			}
 			if($action == 'enableAdmin')
