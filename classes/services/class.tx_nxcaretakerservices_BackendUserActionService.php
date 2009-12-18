@@ -134,7 +134,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 					
 			$Result  = $this->Action('prepareLogin',substr($method, 6),$params);
 			
-			if($Result == 'ok')
+			if(is_array($Result) && $Result['result'] == 'ok')
 			{
 				$factory = tx_caretakerinstance_ServiceFactory::getInstance();
 				$cryptoManager = $factory->getCryptoManager();
@@ -148,8 +148,9 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 				$instance = $node->getInstance();
 												
 				$sendData = $connector->executeOperations($operations,$instance->getUrl(), $instance->getPublicKey());
-								
-				$Result = '<div style="width:330px;"><form action="'.$instance->getUrl().'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$instance->getUrl().'" class="t3-login-submit" tabindex="4" />				</form></div>';
+				$backend = 	$Result['backend'];
+				$backend = substr($backend, 0, strpos($backend, '/typo3')); 
+				$Result = '<div style="width:330px;"><form action="'.$backend.'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$backend.'" class="t3-login-submit" tabindex="4" />				</form></div>';
 			}			
 		}
 		
