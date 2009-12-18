@@ -159,33 +159,6 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 			{	
 				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
 				$backend = $confArray['instanceBackendUrl'];
-//				
-//				if(!$backend) return new tx_caretakerinstance_OperationResult(FALSE, 	'No backend url inserted at the instance.' );
-//				
-//				$lockip = $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'];					
-//				$userid = $parameter['params']['userid'];
-//				$session = $parameter['params']['session'];
-//				$clientIp = $parameter['params']['clientip'];
-//				$hashlockmd5 = t3lib_div::md5int($parameter['params']['hash']);
-//
-//				$clientIpArray = explode('.',$clientIp) ;			
-//				if($lockip == 0) $clientIp = '';
-//				if($lockip == 1) $clientIp = $clientIpArray[0];
-//				if($lockip == 2) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1];
-//				if($lockip == 3) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2];
-//				if($lockip == 4) $clientIp = $clientIpArray[0].'.'.$clientIpArray[1].'.'.$clientIpArray[2].'.'.$clientIpArray[3];
-//								
-//				$insertFields = array(
-//						'ses_id' => $session,
-//						'ses_name' => 'be_typo_user',
-//						'ses_iplock' => $clientIp,
-//						'ses_hashlock' => $hashlockmd5,
-//						'ses_userid' => $userid,
-//						'ses_tstamp' => $GLOBALS['EXEC_TIME']
-//				);
-//	
-//				$GLOBALS['TYPO3_DB']->exec_INSERTquery('be_sessions', $insertFields);
-			
 			    	
 				return new tx_caretakerinstance_OperationResult(TRUE, 	array('result' => 'ok', 'backend' => $backend) );
 			}
@@ -225,15 +198,11 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 				$host = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST');
 				
 				$cookieHost = str_replace($host, '', $siturl);
-				
-				//$session = $parameter['params']['session'];
+								
 				setcookie('be_typo_user', $session, 0, $cookieHost); 
-
-//				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
-//				$backend = $confArray['instanceBackendUrl'];
 					
 				header("Location: " . $backend);
-				//setcookie('be_typo_user', $session, 0, $cookieHost); 
+ 
 				die;
 			}	
 				

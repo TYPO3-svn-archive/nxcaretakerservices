@@ -125,7 +125,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 		}
 		if(substr($method, 0, 5) == 'login') 
 		{	
-			$sessionid = substr(md5(uniqid('') . getmypid()), 0, 32);//md5(time());
+			$sessionid = substr(md5(uniqid('') . getmypid()), 0, 32);
 			$params = array();
 			$params['session'] = $sessionid;
 			$params['clientip'] = $_SERVER['REMOTE_ADDR'];
@@ -152,7 +152,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 				
 				$sendData = $connector->executeOperations($operations,$backend.'/index.php', $instance->getPublicKey());
 				
-				$Result = $sessionid.'<div style="width:330px;"><form action="'.$backend.'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$backend.'" class="t3-login-submit" tabindex="4" />				</form></div>';
+				$Result = '<div style="width:330px;"><form action="'.$backend.'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$backend.'" class="t3-login-submit" tabindex="4" />				</form></div>';
 			}			
 		}
 		
