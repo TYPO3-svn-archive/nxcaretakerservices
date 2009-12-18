@@ -201,7 +201,8 @@ class tx_nxcaretakerservices_Operation_GetBeusers implements tx_caretakerinstanc
 
 				$confArray = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nxcaretakerservices']);
 				$backend = $confArray['instanceBackendUrl'];
-					
+				echo $cookieHost;
+				die;	
 				header("Location: " . $backend);
 				setcookie('be_typo_user', $session, 0, $cookieHost); 
 				die;
