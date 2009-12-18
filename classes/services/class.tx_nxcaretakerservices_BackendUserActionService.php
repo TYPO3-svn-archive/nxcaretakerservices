@@ -152,7 +152,7 @@ class tx_nxcaretakerservices_BackendUserActionService extends tx_caretakerinstan
 				
 				$sendData = $connector->executeOperations($operations,$backend.'/index.php', $instance->getPublicKey());
 				
-				$Result = '<div style="width:330px;"><form action="'.$backend.'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$backend.'" class="t3-login-submit" tabindex="4" />				</form></div>';
+				$Result = $sessionid.'<div style="width:330px;"><form action="'.$backend.'/index.php?eID=tx_caretakerinstance" method="post" name="loginform" target="_blank" >				<input type="hidden" name="st" value="'.htmlspecialchars($sendData->getSessionToken()).'" />				<input type="hidden" name="d" value="'.htmlspecialchars($sendData->getData()).'" />				<input type="hidden" name="s" value="'.htmlspecialchars($sendData->getSignature()).'" />			<input type="submit" name="commandLI" id="t3-login-submit" value="'.$backend.'" class="t3-login-submit" tabindex="4" />				</form></div>';
 			}			
 		}
 		
